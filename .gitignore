@@ -1,0 +1,58 @@
+## editors
+/.idea
+/.vscode
+
+## system files
+.DS_Store
+
+## code coverage folders
+coverage/
+
+## generated types
+packages/*/types
+tsconfig.tsbuildinfo
+
+## npm
+node_modules
+!packages/es-dev-server/test/**/node_modules
+!packages/scoped-elements/demo/**/node_modules
+npm-debug.log
+yarn-error.log
+
+## lerna
+lerna-debug.log
+
+## temp folders
+/.tmp/
+
+## build hp
+/_site/
+/_site-dev/
+
+## we prefer yarn.lock
+package-lock.json
+## lock files in packages we do not need to save
+packages/*/yarn.lock
+
+## build output
+lib
+dist
+build-stats.json
+stats.html
+.rpt2_cache
+storybook-static
+/packages/testing/plugins
+
+## browserstack
+local.log
+
+## generated codelabs
+docs/.vuepress/public/codelabs
+
+# Local Netlify folder
+.netlify
+
+## Rocket ignore files (need to be the full relative path to the folders)
+docs/_merged_data/
+docs/_merged_assets/
+docs/_merged_includes/

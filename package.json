@@ -1,0 +1,47 @@
+{
+  "name": "@open-wc/form-participation-root",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "lint:prettier": "prettier --check",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-wc/form-participation.git"
+  },
+  "author": "Caleb D. Williams <caleb.d.williams@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/open-wc/form-participation/issues"
+  },
+  "homepage": "https://github.com/open-wc/form-participation#readme",
+  "devDependencies": {
+    "@changesets/cli": "^2.18.1",
+    "@open-wc/eslint-config": "^7.0.0",
+    "@open-wc/testing": "^3.0.3",
+    "@web/dev-server": "^0.1.28",
+    "@web/dev-server-esbuild": "^0.2.16",
+    "@web/test-runner": "^0.13.22",
+    "@web/test-runner-commands": "^0.5.13",
+    "@web/test-runner-playwright": "^0.8.8",
+    "construct-style-sheets-polyfill": "^3.0.5",
+    "element-internals-polyfill": "^0.1.49",
+    "husky": "^7.0.4",
+    "lerna": "^4.0.0",
+    "lit": "^2.0.2",
+    "prettier": "^2.5.1",
+    "sinon": "^12.0.1",
+    "typescript": "^4.5.4"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  }
+}

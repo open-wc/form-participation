@@ -1,0 +1,18 @@
+{
+    "name": "@open-wc/form-control",
+    "version": "0.0.0",
+    "description": "Base class for creating form-participating custom elements",
+    "main": "index.js",
+    "scripts": {
+      "build": "tsc --project tsconfig.build.json",
+      "start": "web-dev-server --node-resolve --watch",
+      "test": "web-test-runner test-web/*.test.ts --node-resolve --coverage",
+      "test:playwright": "web-test-runner test-web/*.test.ts --node-resolve --playwright --browsers chromium firefox webkit"
+    },
+    "author": "Caleb D. Williams <caleb.d.williams@gmail.com>",
+    "license": "MIT",
+    "peerDependencies": {
+      "element-internals-polyfill": "^0.1.47"
+    },
+    "sideEffects": false
+  }

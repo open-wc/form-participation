@@ -1,0 +1,15 @@
+{
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+        "composite": true
+    },
+    "include": [
+        "src/*.ts",
+        "*.js",
+        "test-web/*.ts"
+      ],
+      "exclude": [
+        "dist",
+        "types"
+      ]
+}
