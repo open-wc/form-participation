@@ -25,7 +25,6 @@ export const programmaticValidator: Validator = {
   }
 };
 
-
 export const minLengthValidator: Validator = {
   attribute: 'minlength',
   key: 'rangeUnderflow',

@@ -26,14 +26,13 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * is updated.
      */
     static get observedAttributes(): string[] {
-      const validatorAttributes = this.formControlValidators
-        .map(validator => validator.attribute);
+      const validatorAttributes = this.formControlValidators.map((validator) => validator.attribute);
 
       /** @ts-ignore This exits */
       const observedAttributes = super.observedAttributes || [];
 
       /** Make sure there are no duplicates inside the attributes list */
-      const attributeSet = new Set([...observedAttributes, ...validatorAttributes])
+      const attributeSet = new Set([...observedAttributes, ...validatorAttributes]);
       return [...attributeSet];
     }
 
@@ -41,10 +40,8 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * Return the validator associated with a given attribute. If no
      * Validator is associated with the attribute, it will return null.
      */
-    static getValidator(attribute: string): Validator|null {
-      return this.formControlValidators.find(validator =>
-        validator.attribute === attribute
-      ) || null;
+    static getValidator(attribute: string): Validator | null {
+      return this.formControlValidators.find((validator) => validator.attribute === attribute) || null;
     }
 
     /** The ElementInternals instance for the control. */
@@ -60,7 +57,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * Exists to control when an error should be displayed
      * @private
      */
-     #forceError = false;
+    #forceError = false;
 
     /**
      * Toggles to true whenever the element has been focused. This property
@@ -73,7 +70,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * The element that will receive focus when the control's validity
      * state is reported either by a form submission or via API
      */
-    validationTarget: HTMLElement|null = null;;
+    validationTarget: HTMLElement | null = null;
 
     /**
      * The controls' form value. As this property is updated, the form value
@@ -168,7 +165,6 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
       this.removeEventListener('focus', this.#onFocus);
       this.removeEventListener('blur', this.#onBlur);
       this.removeEventListener('invalid', this.#onInvalid);
-
     }
 
     /**
@@ -229,9 +225,9 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
            * truthy before setting the form control value. If it is falsy,
            * remove the form control value.
            */
-          if (!hasChecked || hasChecked && this.checked) {
+          if (!hasChecked || (hasChecked && this.checked)) {
             value = newValue;
-            this.#setValue(newValue)
+            this.#setValue(newValue);
           }
 
           /** If a setter already exists, make sure to call it */
@@ -334,8 +330,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
         return false;
       }
 
-      const showError = this.#forceError ||
-        (this.#touched && !this.validity.valid && !this.#focused);
+      const showError = this.#forceError || (this.#touched && !this.validity.valid && !this.#focused);
 
       if (showError) {
         this.internals.states.add('--show-error');
@@ -355,7 +350,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
       this.#touched = true;
       this.#focused = true;
       this.#shouldShowError();
-    }
+    };
 
     /**
      * Reset this[focused] on blur
@@ -372,7 +367,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
       }
       const showError = this.#shouldShowError();
       this.validationMessageCallback(showError ? this.validationMessage : '');
-    }
+    };
 
     /**
      * For the show error state on invalid
@@ -381,7 +376,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
     #onInvalid = (): void => {
       this.#forceError = true;
       this.#shouldShowError();
-    }
+    };
 
     /**
      * Sets the control's value when updated and invokes the valueChangedCallback
@@ -409,48 +404,47 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
       let validationMessage = '';
       let isValid = true;
 
-      proto.formControlValidators
-        .forEach(validator => {
-          /** Get data off the Validator */
-          const { message , callback } = validator;
+      proto.formControlValidators.forEach((validator) => {
+        /** Get data off the Validator */
+        const { message, callback } = validator;
 
-          /** If a key is not set, use `customError` as a catch-all */
-          const key = validator.key || 'customError';
+        /** If a key is not set, use `customError` as a catch-all */
+        const key = validator.key || 'customError';
 
-          /** Invoke the Validator callback with the instance and the value */
-          const valid = callback(this, value);
+        /** Invoke the Validator callback with the instance and the value */
+        const valid = callback(this, value);
+
+        /**
+         * Invert the validity because we are setting the new property
+         * on the new ValidityState object
+         */
+        validity[key] = !valid;
+
+        if (valid === false) {
+          isValid = false;
+          let messageResult = '';
 
           /**
-           * Invert the validity because we are setting the new property
-           * on the new ValidityState object
+           * The Validator interfaces allows for the message property
+           * to be either a string or a function. If it is a function,
+           * we want to get the returned value to use when calling
+           * ElementInternals.prototype.setValidity.
+           *
+           * If the Validator.message is a string, use it directly. However,
+           * if a control has a ValidityCallback, it can override the error
+           * message for a given validity key.
            */
-          validity[key] = !valid;
-
-          if (valid === false) {
-            isValid = false;
-            let messageResult = '';
-
-            /**
-             * The Validator interfaces allows for the message property
-             * to be either a string or a function. If it is a function,
-             * we want to get the returned value to use when calling
-             * ElementInternals.prototype.setValidity.
-             *
-             * If the Validator.message is a string, use it directly. However,
-             * if a control has a ValidityCallback, it can override the error
-             * message for a given validity key.
-             */
-            if (this.validityCallback(key)) {
-              messageResult = this.validityCallback(key) as string;
-            } else if (message instanceof Function) {
-              messageResult = message(this, value);
-            } else if (typeof message === 'string') {
-              messageResult = message;
-            }
-
-            validationMessage = messageResult;
+          if (this.validityCallback(key)) {
+            messageResult = this.validityCallback(key) as string;
+          } else if (message instanceof Function) {
+            messageResult = message(this, value);
+          } else if (typeof message === 'string') {
+            messageResult = message;
           }
-        });
+
+          validationMessage = messageResult;
+        }
+      });
 
       /**
        * In some cases, the validationTarget might not be rendered
@@ -505,7 +499,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * The returned value will be used as the validationMessage for the given key.
      * @param validationKey {string} - The key that has returned invalid
      */
-    validityCallback(validationKey: string): string|void {}
+    validityCallback(validationKey: string): string | void {}
 
     /**
      * Called when the control's validationMessage should be changed

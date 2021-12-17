@@ -18,7 +18,7 @@ export interface FormControlInterface {
   formResetCallback(): void;
   resetFormControl(): void;
   valueChangedCallback(value: any): void;
-  validityCallback(validationKey: string): string|void;
+  validityCallback(validationKey: string): string | void;
   validationMessageCallback(message: string): void;
 }
 
