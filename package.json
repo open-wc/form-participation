@@ -44,6 +44,9 @@
     "packages/*"
   ],
   "lint-staged": {
-    "**/*": "prettier --write --ignore-unknown"
+    "**/*": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }
