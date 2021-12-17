@@ -3,6 +3,7 @@
       "target": "ES2018",
       "declaration": true,
       "declarationMap": true,
+      "experimentalDecorators": true,
       "sourceMap": true,
       "downlevelIteration": true,
       "strict": true,
