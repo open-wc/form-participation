@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <title>FormControl demo page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="description" content="FormControl demo page">
+    <meta charset="UTF-8">
+    <link href="/demo/page.css" rel="stylesheet">
+  </head>
+  <body>
+    <form id="form">
+      <h1>FormControlMixin demo</h1>
+      <lit-control
+        name="lit-control"
+        required
+      ></lit-control>
+
+      <legacy-demo
+        name="legacy-demo"
+        minlength="4"
+        pattern=".*lit$"
+      >
+        Example of how to implement a legacy control
+      </legacy-demo>
+
+      <vanilla-demo
+        name="vanilla-demo"
+        maxlength="5"
+      >Vanilla JS demo</vanilla-demo>
+
+      <div class="form-field">
+        <label for="switch">Switch</label>
+        <demo-switch
+          id="switch"
+          name="switch"
+          value="switch-on"
+        >
+        </demo-switch>
+      </div>
+
+      <div class="buttons">
+        <button type="reset">Reset</button>
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+
+    <script defer src="/demo/page.ts"></script>
+    <script defer src="/demo/index.ts" type="module"></script>
+  </body>
+</html>

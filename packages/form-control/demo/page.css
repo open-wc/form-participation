@@ -1,0 +1,32 @@
+body {
+    background: ButtonFace;
+}
+form {
+    background: #ffffff;
+    border-radius: 4px;
+    display: flex;
+    flex-flow: column;
+    gap: 24px;
+    margin: 16px auto;
+    padding: 16px;
+    max-width: 400px;
+}
+form h1 {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0;
+}
+form button {
+    font-size: 16px;
+    padding: 4px 8px;
+}
+form .buttons {
+    align-self: flex-end;
+    display: flex;
+    gap: 8px;
+}
+.form-field {
+    align-items: center;
+    display: flex;
+    font-family: Arial, Helvetica, sans-serif;
+    gap: 8px;
+}
