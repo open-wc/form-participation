@@ -4,7 +4,7 @@
     "description": "Utilities for working with forms",
     "main": "index.js",
     "scripts": {
-      "build": "tsc --project tsconfig.build.json",
+      "build": "tsc",
       "start": "web-dev-server --node-resolve --watch",
       "test": "web-test-runner test-web/*.test.ts --node-resolve --coverage",
       "test:playwright": "web-test-runner test-web/*.test.ts --node-resolve --playwright --browsers chromium firefox webkit"

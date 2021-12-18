@@ -1,15 +1,16 @@
 {
-    "extends": "./tsconfig.base.json",
-    "compilerOptions": {
-        "composite": true
-    },
-    "include": [
-        "src/*.ts",
-        "*.js",
-        "test-web/*.ts"
-      ],
-      "exclude": [
-        "dist",
-        "types"
-      ]
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "experimentalDecorators": true
+  },
+  "include": [
+    "src/*.ts",
+    "*.js",
+    "tests/*.ts"
+  ],
+  "exclude": [
+    "dist",
+    "types"
+  ]
 }

@@ -6,7 +6,7 @@ export type Constructor<T = {}> = new (...args: any[]) => T;
 /** Interface of exported FormControl behavior */
 export interface FormControlInterface {
   checked?: boolean;
-  validationTarget?: HTMLElement;
+  validationTarget?: HTMLElement | null;
   value: any;
   readonly form: HTMLFormElement;
   readonly internals: IElementInternals;
