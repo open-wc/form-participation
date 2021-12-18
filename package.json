@@ -24,6 +24,7 @@
     "@changesets/cli": "^2.18.1",
     "@open-wc/eslint-config": "^7.0.0",
     "@open-wc/testing": "^3.0.3",
+    "@types/sinon": "^10.0.6",
     "@typescript-eslint/parser": "^5.7.0",
     "@web/dev-server": "^0.1.28",
     "@web/dev-server-esbuild": "^0.2.16",

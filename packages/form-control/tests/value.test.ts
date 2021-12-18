@@ -1,10 +1,7 @@
 import { expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
-import { ValueSet, ValueSetChecked } from './elements';
+import { FormControlMixin } from "../src";
 
-window.customElements.define('value-set', ValueSet);
-window.customElements.define('value-set-checked', ValueSetChecked);
-
-describe('The FormControlMixin using LitElement', () => {
+describe('The FormControlMixin using HTMLElement', () => {
   let form: HTMLFormElement;
   let el: ValueSet;
   let elChecked: ValueSetChecked;
@@ -20,19 +17,25 @@ describe('The FormControlMixin using LitElement', () => {
         ></value-set-checked>
       </form>
     `);
-    
+
     el = form.querySelector<ValueSet>('value-set')!;
     elChecked = form.querySelector<ValueSetChecked>('value-set-checked')!;
   });
 
   afterEach(fixtureCleanup);
 
+  describe('generic behavior', () => {
+    it('will keep track of the parent form', async () => {
+      expect(el.form).to.equal(form);
+    });
+  });
+
   describe('no checked prperty', () => {
     it('will intialize without a value', async () => {
       const data = new FormData(form);
       expect(data.get('formControl')).to.be.null;
     });
-  
+
     it('will set the value on the form when the host value is set', async () => {
       el.value = 'foo';
       const data = new FormData(form);
@@ -45,7 +48,7 @@ describe('The FormControlMixin using LitElement', () => {
       const data = new FormData(form);
       expect(data.get('formControlChecked')).to.be.null;
     });
-  
+
     it('will not participate if checked is false', async () => {
       elChecked.value = 'foo';
       const data = new FormData(form);
@@ -70,3 +73,24 @@ describe('The FormControlMixin using LitElement', () => {
     });
   });
 });
+
+export class NativeFormControl extends FormControlMixin(HTMLElement) {}
+export class ValueSet extends NativeFormControl {
+  constructor() {
+    super();
+    const root = this.attachShadow({ mode: 'open' });
+    const validationTarget = document.createElement('div');
+    validationTarget.tabIndex = 0;
+    root.append(validationTarget);
+  }
+
+  get validationTarget(): HTMLDivElement {
+    return this.shadowRoot!.querySelector<HTMLDivElement>('div')!;
+  }
+}
+export class ValueSetChecked extends ValueSet {
+  checked = false;
+}
+
+window.customElements.define('value-set', ValueSet);
+window.customElements.define('value-set-checked', ValueSetChecked);

@@ -69,7 +69,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
     /**
      * The element that will receive focus when the control's validity
      * state is reported either by a form submission or via API
-     * 
+     *
      * We use declare since this is optional and we don't particularly
      * care how the consuming component implements this (as a field, member
      * or getter/setter)
