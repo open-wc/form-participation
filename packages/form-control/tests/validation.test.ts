@@ -1,5 +1,4 @@
-import { aTimeout, expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
-import sinon from 'sinon';
+import { expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
 import { FormControlMixin, Validator } from "../src";
 
 let callCount = 0;
@@ -15,7 +14,6 @@ const noopValidator: Validator = {
 describe('The FormControlMixin using HTMLElement', () => {
   let form: HTMLFormElement;
   let noopEl: NoopValidatorEl;
-  let noopValidatorSpy = sinon.spy(noopValidator.callback);
 
   beforeEach(async () => {
     form = await fixture<HTMLFormElement>(html`
