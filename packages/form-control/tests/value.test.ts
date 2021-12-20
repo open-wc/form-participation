@@ -28,6 +28,24 @@ describe('The FormControlMixin using HTMLElement', () => {
     it('will keep track of the parent form', async () => {
       expect(el.form).to.equal(form);
     });
+
+    it('can reset an element value on non-checked controls', async () => {
+      el.value = 'foo';
+      let data = new FormData(form);
+      expect(data.get('formControl')).to.equal('foo');
+      el.resetFormControl();
+      data = new FormData(form);
+      expect(data.get('formControl')).to.equal('');
+    });
+
+    it('can reset an element value on non-checked controls', async () => {
+      elChecked.checked = true;
+      let data = new FormData(form);
+      expect(data.get('formControlChecked')).to.equal('foo');
+      elChecked.resetFormControl();
+      data = new FormData(form);
+      expect(data.get('formControlChecked')).to.be.null;
+    });
   });
 
   describe('no checked prperty', () => {
@@ -90,6 +108,7 @@ export class ValueSet extends NativeFormControl {
 }
 export class ValueSetChecked extends ValueSet {
   checked = false;
+  value = 'foo';
 }
 
 window.customElements.define('value-set', ValueSet);

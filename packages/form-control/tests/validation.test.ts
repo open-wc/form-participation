@@ -11,28 +11,33 @@ const noopValidator: Validator = {
   }
 };
 
+const noopValidatorWithAttribute: Validator = {
+  attribute: 'noop',
+  ...noopValidator
+};
+
 describe('The FormControlMixin using HTMLElement', () => {
   let form: HTMLFormElement;
-  let noopEl: NoopValidatorEl;
-
-  beforeEach(async () => {
-    form = await fixture<HTMLFormElement>(html`
-      <form>
-        <no-op-validator-el
-          name="formControl"
-        ></no-op-validator-el>
-      </form>
-    `);
-
-    noopEl = form.querySelector<NoopValidatorEl>('no-op-validator-el')!;
-  });
-
-  afterEach(fixtureCleanup);
-  afterEach(() => {
-    callCount = 0;
-  });
+  let noopEl: NoopValidatorEl|NoopValidatorAttr;
 
   describe('validator with no attributes', () => {
+    beforeEach(async () => {
+      form = await fixture<HTMLFormElement>(html`
+        <form>
+          <no-op-validator-el
+            name="formControl"
+          ></no-op-validator-el>
+        </form>
+      `);
+
+      noopEl = form.querySelector<NoopValidatorEl>('no-op-validator-el')!;
+    });
+
+    afterEach(fixtureCleanup);
+    afterEach(() => {
+      callCount = 0;
+    });
+
     it('has access to the validators array', async () => {
       expect(NoopValidatorEl.formControlValidators.length).to.equal(1);
     });
@@ -88,6 +93,36 @@ describe('The FormControlMixin using HTMLElement', () => {
       expect(noopEl.checkValidity()).to.equal(noopEl.validity.valid);
     });
   });
+
+  describe('validator with attributes', () => {
+    beforeEach(async () => {
+      form = await fixture<HTMLFormElement>(html`
+        <form>
+          <no-op-validator-attr
+            name="formControl"
+          ></no-op-validator-attr>
+        </form>
+      `);
+
+      noopEl = form.querySelector<NoopValidatorEl>('no-op-validator-attr')!;
+    });
+
+    afterEach(fixtureCleanup);
+    afterEach(() => {
+      callCount = 0;
+    });
+
+    it('will add the attribute to the observed attributes', async () => {
+      const constructor = noopEl.constructor as unknown as NoopValidatorAttr & { observedAttributes: string[] };
+      expect(constructor.observedAttributes).to.deep.equal(['noop'])
+    });
+
+    it('will call the validator on attribute change', async () => {
+      expect(callCount).to.equal(1);
+      noopEl.toggleAttribute('noop', true);
+      expect(callCount).to.equal(2);
+    });
+  });
 });
 
 export class NativeFormControl extends FormControlMixin(HTMLElement) {}
@@ -114,4 +149,10 @@ export class NoopValidatorEl extends NativeFormControl {
   }
 }
 
+export class NoopValidatorAttr extends NoopValidatorEl {
+  static get formControlValidators() { return [noopValidatorWithAttribute]; }
+}
+
 window.customElements.define('no-op-validator-el', NoopValidatorEl);
+window.customElements.define('no-op-validator-attr', NoopValidatorAttr);
+

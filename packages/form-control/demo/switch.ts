@@ -5,6 +5,16 @@ import styles from './switch.style';
 
 @customElement('demo-switch')
 export class DemoSwitch extends FormControlMixin(LitElement) {
+  static formControlValidators = [{
+    key: 'customError',
+    message: '',
+    attribute: 'foo',
+    callback(instance, value) {
+      console.log(value);
+      return true;
+    }
+  }]
+
   static styles: CSSStyleSheet = styles;
 
   @property({ type: Boolean, reflect: true })

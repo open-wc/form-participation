@@ -3,6 +3,7 @@ import { Constructor, FormControlInterface, IControlHost, Validator } from './ty
 
 export function FormControlMixin<T extends Constructor<HTMLElement & IControlHost>>(SuperClass: T) {
   class FormControl extends SuperClass {
+
     /** Wires up control instances to be form associated */
     static get formAssociated() {
       return true;
@@ -15,8 +16,9 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * When a Validator's callback returns false, the entire form control will
      * be set to an invalid state.
      */
-    static get formControlValidators(): Validator[] {
-      return [];
+    declare static formControlValidators: Validator[];
+    private static get validators(): Validator[] {
+      return this.formControlValidators || [];
     }
 
     /**
@@ -26,7 +28,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * is updated.
      */
     static get observedAttributes(): string[] {
-      const validatorAttributes = this.formControlValidators.map((validator) => validator.attribute);
+      const validatorAttributes = this.validators.map((validator) => validator.attribute);
 
       /** @ts-ignore This exits */
       const observedAttributes = super.observedAttributes || [];
@@ -41,7 +43,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * Validator is associated with the attribute, it will return null.
      */
     static getValidator(attribute: string): Validator | null {
-      return this.formControlValidators.find((validator) => validator.attribute === attribute) || null;
+      return this.validators.find((validator) => validator.attribute === attribute) || null;
     }
 
     /** The ElementInternals instance for the control. */
@@ -65,6 +67,11 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * @private
      */
     #touched = false;
+
+    /** Will return true if the control has a checked property */
+    get #isCheckedElement(): boolean {
+      return this.hasOwnProperty('checked') || this.constructor.prototype.hasOwnProperty('checked');
+    }
 
     /**
      * The element that will receive focus when the control's validity
@@ -186,7 +193,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
       let get: ((v: any) => void) | undefined;
 
       /** Look to see if '`checked'` is on the control's prototype */
-      const hasChecked = this.hasOwnProperty('checked') || this.constructor.prototype.hasOwnProperty('checked');
+      const hasChecked = this.#isCheckedElement;
 
       /**
        * The FormControlMixin writes the value property on the element host
@@ -229,8 +236,11 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
            * truthy before setting the form control value. If it is falsy,
            * remove the form control value.
            */
-          if (!hasChecked || (hasChecked && this.checked)) {
-            value = newValue;
+          if (this.#isCheckedElement && this.checked) {
+            this.#setValue(newValue);
+          } else if (this.#isCheckedElement && !this.checked) {
+            this.#setValue(null);
+          } else {
             this.#setValue(newValue);
           }
 
@@ -273,6 +283,9 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
             return checked;
           },
           set(newChecked) {
+            /** Updated closure value */
+            checked = newChecked;
+
             if (newChecked) {
               /** If truthy, set the form value to the instance's value */
               this.#setValue(this.value);
@@ -285,9 +298,6 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
             if (set) {
               set.call(this, newChecked);
             }
-
-            /** Updated closure value */
-            checked = newChecked;
           }
         });
       }
@@ -313,7 +323,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * Resets a form control to its initial state
      */
     resetFormControl(): void {
-      if (this.hasOwnProperty('checked') && this.checked === true) {
+      if (this.#isCheckedElement) {
         this.checked = false;
       } else {
         this.value = '';
@@ -408,7 +418,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
       let validationMessage = '';
       let isValid = true;
 
-      proto.formControlValidators.forEach((validator) => {
+      proto.validators.forEach((validator) => {
         /** Get data off the Validator */
         const { message, callback } = validator;
 
