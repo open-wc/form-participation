@@ -46,6 +46,18 @@ describe('The FormControlMixin using HTMLElement', () => {
       data = new FormData(form);
       expect(data.get('formControlChecked')).to.be.null;
     });
+
+    it('will reset the control on form reset', async () => {
+      el.value = 'foo';
+      elChecked.checked = true;
+      let data = new FormData(form);
+      expect(data.get('formControl')).to.equal('foo');
+      expect(data.get('formControlChecked')).to.equal('foo');
+      form.reset();
+      data = new FormData(form);
+      expect(data.get('formControl')).to.equal('');
+      expect(data.get('formControlChecked')).to.be.null;
+    });
   });
 
   describe('no checked prperty', () => {
