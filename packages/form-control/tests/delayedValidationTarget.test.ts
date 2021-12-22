@@ -1,31 +1,56 @@
 import { aTimeout, expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
-import sinon from 'sinon';
 import { FormControlMixin, Validator } from "../src";
 
 describe('The FormControlMixin using HTMLElement', () => {
   let form: HTMLFormElement;
-  let el: DelayedTarget;
+  let el: DelayedTarget|NoTarget;
 
-  beforeEach(async () => {
-    form = await fixture<HTMLFormElement>(html`
-      <form>
-        <delayed-target
-          name="formControl"
-        ></delayed-target>
-      </form>
-    `);
+  describe('the delayed validationTarget scenario', () => {
+    beforeEach(async () => {
+      form = await fixture<HTMLFormElement>(html`
+        <form>
+          <delayed-target
+            name="formControl"
+          ></delayed-target>
+        </form>
+      `);
 
-    el = form.querySelector<DelayedTarget>('delayed-target')!;
+      el = form.querySelector<DelayedTarget>('delayed-target')!;
+    });
+
+    afterEach(fixtureCleanup);
+
+    it('will wait for the validaitonTarget to be set', async () => {
+      expect(el.validationTarget).to.be.undefined;
+      expect(el.validity.valid).to.be.false;
+      await aTimeout(100);
+      form.requestSubmit();
+      expect(document.activeElement?.shadowRoot?.activeElement).to.equal(el.validationTarget);
+    });
   });
 
-  afterEach(fixtureCleanup);
+  describe('the no validationTarget scenario', () => {
+    beforeEach(async () => {
+      form = await fixture<HTMLFormElement>(html`
+        <form>
+          <no-target
+            name="formControl"
+          ></no-target>
+        </form>
+      `);
 
-  it('will wait for the validaitonTarget to be set', async () => {
-    expect(el.validationTarget).to.be.undefined;
-    expect(el.validity.valid).to.be.false;
-    await aTimeout(100);
-    form.requestSubmit();
-    expect(document.activeElement?.shadowRoot?.activeElement).to.equal(el.validationTarget);
+      el = form.querySelector<NoTarget>('no-target')!;
+    });
+
+    afterEach(fixtureCleanup);
+
+    it('not set the validation target', async () => {
+      expect(el.validationTarget).to.be.undefined;
+      expect(el.validity.valid).to.be.false;
+      await aTimeout(500);
+      form.requestSubmit();
+      expect(document.activeElement?.shadowRoot?.activeElement).to.be.undefined;
+    });
   });
 });
 
@@ -61,4 +86,22 @@ export class DelayedTarget extends NativeFormControl {
   }
 }
 
+export class NoTarget extends NativeFormControl {
+  static get formControlValidators(): Validator[] {
+    return [{
+      key: 'customError',
+      message: 'always invalid',
+      callback(): boolean {
+        return false;
+      }
+    }];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+}
+
 window.customElements.define('delayed-target', DelayedTarget);
+window.customElements.define('no-target', NoTarget);

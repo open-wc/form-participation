@@ -138,9 +138,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
     }
 
     attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-      if (super.attributeChangedCallback) {
-        super.attributeChangedCallback(name, oldValue, newValue);
-      }
+      super.attributeChangedCallback?.(name, oldValue, newValue);
 
       /**
        * Check to see if a Validator is associated with the changed attribute.
@@ -156,9 +154,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
     }
 
     connectedCallback() {
-      if (super.connectedCallback) {
-        super.connectedCallback();
-      }
+      super.connectedCallback?.();
 
       /** Initialize the form control and perform initial validation */
       this.#initFormControl();
@@ -167,9 +163,8 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
     }
 
     disconnectedCallback() {
-      if (super.disconnectedCallback) {
-        super.disconnectedCallback();
-      }
+      super.disconnectedCallback?.();
+
       /**
        * Remove the event listeners that toggles the touched and focused states
        */
