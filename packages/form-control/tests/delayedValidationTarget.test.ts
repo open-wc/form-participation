@@ -1,4 +1,5 @@
 import { aTimeout, expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
+import sinon from 'sinon';
 import { FormControlMixin, Validator } from "../src";
 
 describe('The FormControlMixin using HTMLElement', () => {
@@ -50,6 +51,13 @@ describe('The FormControlMixin using HTMLElement', () => {
       await aTimeout(500);
       form.requestSubmit();
       expect(document.activeElement?.shadowRoot?.activeElement).to.be.undefined;
+    });
+
+    it('will cancel the validationTarget loop if the control becomes true', async () => {
+      const spy = sinon.spy(window, 'clearInterval');
+      el.internals.setValidity({});
+      await aTimeout(0);
+      expect(spy.called).to.be.true;
     });
   });
 });
