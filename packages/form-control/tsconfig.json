@@ -7,7 +7,8 @@
   "include": [
     "src/*.ts",
     "*.js",
-    "tests/*.ts"
+    "tests/*.ts",
+    "demo/*.ts"
   ],
   "exclude": [
     "dist",

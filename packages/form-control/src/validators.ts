@@ -1,13 +1,14 @@
 import { Validator } from './index';
+import { FormControlInterface } from './types';
 
 export const requiredValidator: Validator = {
   attribute: 'required',
   key: 'valueMissing',
-  message: 'You must include a value',
+  message: 'Please fill out this field',
   callback(instance: HTMLElement & { required: boolean }, value: any): boolean {
     let valid = true;
 
-    if (instance.required && !value) {
+    if ((instance.hasAttribute('required') || instance.required) && !value) {
       valid = false;
     }
 
@@ -28,13 +29,19 @@ export const programmaticValidator: Validator = {
 export const minLengthValidator: Validator = {
   attribute: 'minlength',
   key: 'rangeUnderflow',
-  message(instance: HTMLElement & { minLength: number }): string {
-    return `Value must be at least ${instance.minLength} characters long`;
+  message(instance: FormControlInterface & { minLength: number }): string {
+    return `Please use at least ${instance.minLength} characters (you are currently using ${instance.value.length} characters).`;
   },
   callback(instance: HTMLElement & { minLength: number }, value): boolean {
+    /** If no value is provided, this validator should return true */
+    if (!value) {
+      return true;
+    }
+
     if (!!value && instance.minLength > value.length) {
       return false;
     }
+
     return true;
   }
 };
@@ -42,13 +49,24 @@ export const minLengthValidator: Validator = {
 export const maxLengthValidator: Validator = {
   attribute: 'maxlength',
   key: 'rangeOverflow',
-  message(instance: HTMLElement & { maxLength: number }): string {
-    return `Value must not be more than ${instance.maxLength} characters long`;
+  message(
+    instance: FormControlInterface & { maxLength: number }
+  ): string {
+    return `Please use no more than ${instance.maxLength} characters (you are currently using ${instance.value.length} characters).`;
   },
-  callback(instance: HTMLElement & { maxLength: number }, value): boolean {
-    if (!!value && instance.maxLength <= value.length) {
+  callback(
+    instance: HTMLElement & { maxLength: number },
+    value: any
+  ): boolean {
+    /** If maxLength isn't set, this is valid */
+    if (!instance.maxLength) {
+      return true;
+    }
+
+    if (!!value && instance.maxLength < value.length) {
       return false;
     }
+
     return true;
   }
 };
@@ -56,10 +74,13 @@ export const maxLengthValidator: Validator = {
 export const patternValidator: Validator = {
   attribute: 'pattern',
   key: 'patternMismatch',
-  message(): string {
-    return `The value does not match the required format`;
-  },
+  message: 'Please match the requested format',
   callback(instance: HTMLElement & { pattern: string }, value): boolean {
+    /** If no value is provided, this validator should return true */
+    if (!value || !instance.pattern) {
+      return true;
+    }
+
     const regExp = new RegExp(instance.pattern);
     return !!regExp.exec(value);
   }
