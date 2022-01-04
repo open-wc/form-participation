@@ -1,0 +1,15 @@
+{
+    "name": "@open-wc/form-helpers",
+    "version": "0.0.0",
+    "description": "Helpers for working with forms",
+    "main": "index.js",
+    "scripts": {
+      "build": "tsc",
+      "start": "web-dev-server --node-resolve --watch",
+      "test": "web-test-runner tests/*.test.ts --node-resolve --coverage",
+      "test:playwright": "web-test-runner tests/*.test.ts --node-resolve --playwright --browsers chromium firefox webkit"
+    },
+    "author": "Caleb D. Williams <caleb.d.williams@gmail.com>",
+    "license": "MIT",
+    "sideEffects": false
+  }
