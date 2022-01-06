@@ -1,5 +1,5 @@
 # @open-wc/form-control
-A standardized mixin for creating custom web component form controls with a standardized validation function pattern.
+A standardized mixin for creating form-associated custom elements using a standardized validation function pattern.
 
 ## Install
 
@@ -18,7 +18,7 @@ After importing, create a web component class that extends the mixin, and provid
 > The `FormControlMixin` has been tested with both [LitElement](https://lit.dev/) and `HTMLElement`, so `LitElement` is not required, but all examples in this documentation will show `LitElement` web component syntax and decorators.
 
 
-```js
+```typescript
 // custom web component class that extends FormControlMixin
 
 import { LitElement, html } from 'lit';
@@ -81,7 +81,7 @@ This library makes use of [ElementInternals](https://developer.mozilla.org/en-US
 In order to make these features work in all browsers you will need to include the [element-internals-polyfill](https://www.npmjs.com/package/element-internals-polyfill). Refer to the `element-internals-polyfill` documentation for installation and usage instructions.
 
 ### `Value` & `checked`
-Any component that uses the `FormControlMixin` will have a `value` property that the element will apply to the parent form. If the element also has a `checked` property on the prototype (think checkbox or radio button) the element's value will only be applied to the parent form when the `checked` property is truthy (like native checkboxes and radio buttons behave)
+Any component that uses the `FormControlMixin` will have a `value` property that the element will apply to the parent form. If the element also has a `checked` property on the prototype (think checkbox or radio button) the element's value will only be applied to the parent form when the `checked` property is truthy (like native checkboxes and radio buttons behave).
 
 ## Validation
 
@@ -127,7 +127,7 @@ Including the `requiredValidator` adds a validation function attached to the `va
 > Note, this does require the element's prototype to actually have a `required` property defined.
 
 ### Validation Target
-Every `FormControlMixin` element will need a public `validationTarget` which must be a focusable DOM element. In the event a control becomes invalid, this item will be focused on form submit for accessibility purposes. Failure to do so will cause an error to throw. 
+Every `FormControlMixin` element will need a public `validationTarget` which must be a focusable DOM element in the custom element's `shadowRoot`. In the event a control becomes invalid, this item will be focused on form submit for accessibility purposes. Failure to do so will cause an error to throw. 
 
 ### Validators
 This package contains a few standardized validators, though more could be added for various unconsidered use cases. So far, there are validators for:
