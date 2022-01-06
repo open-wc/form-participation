@@ -14,6 +14,10 @@ yarn add @open-wc/form-helpers
 
 ### Implicit form submit
 The `submit` helper is a useful helper for firing the forms `submit` event – as a preventable event – only when the form's validity reports back as truthy (meaning the form has all valid values in its inputs) and calling the provided form's `submit()` method if the submit event is not `defaultPrevented`.
+
+It is perhaps best used to add implicit form submission to inputs in a form when the `Enter` key is pressed so that any input can submit a form. Such a feature can be useful for search inputs with no submit button.
+
+> This helper is somewhat of a stop gap method until Safari implements [HTMLFormElement.requestSubmit()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/requestSubmit)
 ```html
 <form id="someForm" @submit="${submitHandler}">
   <input required>
