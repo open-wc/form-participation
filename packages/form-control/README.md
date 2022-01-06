@@ -25,7 +25,7 @@ import { LitElement, html } from 'lit';
 import { customElement, query, property } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js';
 
-import { FormControlMixin } from '@open-wc/form-participation';
+import { FormControlMixin } from '@open-wc/form-control';
 
 @customElement('demo-form-control')
 class DemoFormControl extends FormControlMixin(LitElement) {
@@ -92,8 +92,7 @@ import { LitElement, html } from 'lit';
 import { customElement, query, property } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js';
 
-import { FormControlMixin } from './path/to/mixin';
-import { requiredValidator } from './path/to/mixin/validators';
+import { FormControlMixin, requiredValidator } from '@open-wc/form-control';
 
 @customElement('demo-form-control')
 class DemoFormControl extends FormControlMixin(LitElement) {
