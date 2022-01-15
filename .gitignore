@@ -42,6 +42,12 @@ stats.html
 .rpt2_cache
 storybook-static
 /packages/testing/plugins
+packages/**/*.js
+packages/**/*.js.map
+packages/**/*.d.ts
+packages/**/*.ts.map
+**/*.tsbuildinfo
+
 
 ## browserstack
 local.log

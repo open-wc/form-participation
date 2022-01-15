@@ -1,5 +1,5 @@
 import { IElementInternals } from 'element-internals-polyfill';
-import { Constructor, FormControlInterface, IControlHost, Validator } from './types';
+import { Constructor, FormControlInterface, FormValue, IControlHost, Validator } from './types';
 
 export function FormControlMixin<T extends Constructor<HTMLElement & IControlHost>>(SuperClass: T) {
   class FormControl extends SuperClass {
@@ -88,7 +88,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * will be updated. If a given control has a `checked` property, the value
      * will only be set if `checked` is truthy.
      */
-    value: any = '';
+    value: FormValue = '';
 
     /** Return a reference to the control's form */
     get form(): HTMLFormElement {
@@ -179,13 +179,13 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      */
     #initFormControl(): void {
       /** Closed over variable to track value changes */
-      let value: any = this.value || '';
+      let value: FormValue = this.value || '';
 
       /** Value getter reference within the closure */
-      let set: ((v: any) => void) | undefined;
+      let set: ((v: FormValue) => void) | undefined;
 
       /** Value setter reference within the closure */
-      let get: ((v: any) => void) | undefined;
+      let get: ((v: FormValue) => void) | undefined;
 
       /** Look to see if '`checked'` is on the control's prototype */
       const hasChecked = this.#isCheckedElement;
@@ -312,7 +312,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * in cases where `checked` is present upon initialization, this will be
      * effectively `this.checked && this.value`.
      */
-    valueChangedCallback(value: any): void {}
+    valueChangedCallback(value: FormValue): void {}
 
     /**
      * Resets a form control to its initial state
@@ -392,9 +392,9 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * for the element. Once the value has been set, invoke the Validators.
      * @private
      */
-    #setValue(value: any): void {
+    #setValue(value: FormValue): void {
       this.#forceError = false;
-      this.internals.setFormValue(value);
+      this.internals.setFormValue(value as string); /** Typed to string to work with polyfill */
       if (this.valueChangedCallback) {
         this.valueChangedCallback(value);
       }
@@ -407,7 +407,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * Call all the Validators on the control
      * @private
      */
-    #validate(value: any): void {
+    #validate(value: FormValue): void {
       const proto = this.constructor as typeof FormControl;
       const validity: Partial<Record<keyof ValidityState, boolean>> = {};
       let validationMessage = '';

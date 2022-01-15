@@ -3,6 +3,9 @@ import { IElementInternals } from 'element-internals-polyfill';
 /** Generic constructor type */
 export type Constructor<T = {}> = new (...args: any[]) => T;
 
+/** Union type for form values */
+export type FormValue = File|FormData|string|null;
+
 /** Interface of exported FormControl behavior */
 export interface FormControlInterface {
   checked?: boolean;
