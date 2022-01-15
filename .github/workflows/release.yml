@@ -8,7 +8,7 @@ on:
 jobs:
   release:
     # Prevents changesets action from creating a PR on forks
-    if: github.repository == 'modernweb-dev/storybook-prebuilt'
+    if: github.repository == 'open-wc/form-participation'
     name: Release
     runs-on: ubuntu-latest
     steps:
