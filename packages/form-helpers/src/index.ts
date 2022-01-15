@@ -19,6 +19,8 @@ export const submit = (form: HTMLFormElement): void => {
   }
 };
 
+export type FormValue = string|FormData|File|FormValue[];
+
 /**
  * Parse a form and return a set of values based on the name/value pair.
  * If multiple controls of a similar name exist, return an array for those values;
@@ -27,15 +29,16 @@ export const submit = (form: HTMLFormElement): void => {
  * @param form {HTMLFormElement} - The form to parse for values
  * @returns {Record<string, any>} - An object representing the form's current values
  */
-export const formValues = (form: HTMLFormElement): Record<string, any> => {
+export const formValues = (form: HTMLFormElement): Record<string, FormValue> => {
   const formData = new FormData(form);
-  const values: Record<string, any> = {};
+  const values: Record<string, FormValue> = {};
 
   for (let [key, value] of formData.entries()) {
     if (!values.hasOwnProperty(key)) {
       values[key] = value;
     } else if (Array.isArray(values[key])) {
-      values[key].push(value);
+      const pointer = values[key] as FormValue[];
+      pointer.push(value);
     } else {
       values[key] = [values[key], value];
     }
@@ -57,7 +60,7 @@ export const formValues = (form: HTMLFormElement): Record<string, any> => {
  * @param form {HTMLFormElement} - The form to grab values from
  * @returns {Object<any, any>} - An object representation of the form
  */
-export const parseFormAsObject = (form: HTMLFormElement): Record<any, any> => {
+export const parseFormAsObject = (form: HTMLFormElement): Record<string, FormValue> => {
   const data = formValues(form);
   const output: Record<any, any> = {};
 

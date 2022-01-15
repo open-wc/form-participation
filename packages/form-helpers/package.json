@@ -3,13 +3,26 @@
     "version": "0.0.0",
     "description": "Helpers for working with forms",
     "main": "index.js",
+    "module": "index.js",
+    "exports": {
+      ".": "./index.js"
+    },
+    "files": [
+      "src/*.js",
+      "index.js",
+      "*.d.ts",
+      "*.js.map"
+    ],
     "scripts": {
       "build": "tsc",
       "start": "web-dev-server --node-resolve --watch",
       "test": "web-test-runner tests/*.test.ts --node-resolve --coverage",
       "test:playwright": "web-test-runner tests/*.test.ts --node-resolve --playwright --browsers chromium firefox webkit"
     },
-    "author": "Caleb D. Williams <caleb.d.williams@gmail.com>",
+    "contributors": [
+      "Caleb D. Williams <caleb.d.williams@gmail.com>",
+      "Michael Warren <michaelwarren1106@gmail.com>"
+    ],
     "license": "MIT",
     "sideEffects": false
   }
