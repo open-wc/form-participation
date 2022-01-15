@@ -1,5 +1,5 @@
 import { expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
-import { FormControlMixin, Validator } from "../src";
+import { FormControlMixin, Validator } from '../src';
 
 let callCount = 0;
 const noopValidator: Validator = {
@@ -18,7 +18,7 @@ const noopValidatorWithAttribute: Validator = {
 
 describe('The FormControlMixin using HTMLElement', () => {
   let form: HTMLFormElement;
-  let noopEl: NoopValidatorEl|NoopValidatorAttr;
+  let noopEl: NoopValidatorEl | NoopValidatorAttr;
 
   describe('validator with no attributes', () => {
     beforeEach(async () => {
@@ -114,7 +114,7 @@ describe('The FormControlMixin using HTMLElement', () => {
 
     it('will add the attribute to the observed attributes', async () => {
       const constructor = noopEl.constructor as unknown as NoopValidatorAttr & { observedAttributes: string[] };
-      expect(constructor.observedAttributes).to.deep.equal(['noop'])
+      expect(constructor.observedAttributes).to.deep.equal(['noop']);
     });
 
     it('will call the validator on attribute change', async () => {
@@ -150,9 +150,10 @@ export class NoopValidatorEl extends NativeFormControl {
 }
 
 export class NoopValidatorAttr extends NoopValidatorEl {
-  static get formControlValidators() { return [noopValidatorWithAttribute]; }
+  static get formControlValidators() {
+    return [noopValidatorWithAttribute];
+  }
 }
 
 window.customElements.define('no-op-validator-el', NoopValidatorEl);
 window.customElements.define('no-op-validator-attr', NoopValidatorAttr);
-

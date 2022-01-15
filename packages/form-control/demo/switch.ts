@@ -11,7 +11,7 @@ export class DemoSwitch extends FormControlMixin(LitElement) {
   checked = false;
 
   @property({ type: String })
-  value: string  = '';
+  value: string = '';
 
   protected firstUpdated(_changedProperties: Map<string | number | symbol, unknown>): void {
     super.firstUpdated(_changedProperties);
@@ -30,11 +30,11 @@ export class DemoSwitch extends FormControlMixin(LitElement) {
     this.checked = !this.checked;
     this.internals.ariaChecked = this.checked.toString();
     this.dispatchEvent(changeEvent);
-  }
+  };
 
   #onKeypress = (event: KeyboardEvent): void => {
     if (['Enter', 'Space'].includes(event.code)) {
       this.#onClick();
     }
-  }
+  };
 }

@@ -47,7 +47,7 @@ describe('the form as object helper', () => {
     expect(data).to.deep.equal({
       one: {
         a: 'a',
-        b: 'b',
+        b: 'b'
       },
       two: '2',
       foo: {
@@ -62,4 +62,4 @@ describe('the form as object helper', () => {
       }
     });
   });
-})
+});

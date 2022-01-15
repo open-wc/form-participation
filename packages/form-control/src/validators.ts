@@ -49,15 +49,10 @@ export const minLengthValidator: Validator = {
 export const maxLengthValidator: Validator = {
   attribute: 'maxlength',
   key: 'rangeOverflow',
-  message(
-    instance: FormControlInterface & { maxLength: number }
-  ): string {
+  message(instance: FormControlInterface & { maxLength: number }): string {
     return `Please use no more than ${instance.maxLength} characters (you are currently using ${instance.value.length} characters).`;
   },
-  callback(
-    instance: HTMLElement & { maxLength: number },
-    value: any
-  ): boolean {
+  callback(instance: HTMLElement & { maxLength: number }, value: any): boolean {
     /** If maxLength isn't set, this is valid */
     if (!instance.maxLength) {
       return true;

@@ -1,5 +1,13 @@
 import { expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
-import { FormControlMixin, maxLengthValidator, minLengthValidator, patternValidator, programmaticValidator, requiredValidator, Validator } from "../src";
+import {
+  FormControlMixin,
+  maxLengthValidator,
+  minLengthValidator,
+  patternValidator,
+  programmaticValidator,
+  requiredValidator,
+  Validator
+} from '../src';
 
 describe('The FormControlMixin using HTMLElement', () => {
   let form: HTMLFormElement;
@@ -73,7 +81,9 @@ describe('The FormControlMixin using HTMLElement', () => {
       el.value = 'ab';
       expect(el.validity.valid).to.be.false;
       expect(el.validity.rangeUnderflow).to.be.true;
-      expect(el.internals.validationMessage).to.equal('Please use at least 3 characters (you are currently using 2 characters).');
+      expect(el.internals.validationMessage).to.equal(
+        'Please use at least 3 characters (you are currently using 2 characters).'
+      );
     });
 
     it('will validate element when value length is equal to minLength', async () => {
@@ -109,7 +119,9 @@ describe('The FormControlMixin using HTMLElement', () => {
       el.value = 'abcd';
       expect(el.validity.valid).to.be.false;
       expect(el.validity.rangeOverflow).to.be.true;
-      expect(el.internals.validationMessage).to.equal('Please use no more than 3 characters (you are currently using 4 characters).');
+      expect(el.internals.validationMessage).to.equal(
+        'Please use no more than 3 characters (you are currently using 4 characters).'
+      );
     });
 
     it('will validate controls where value is equal to maxLength', async () => {
@@ -119,7 +131,9 @@ describe('The FormControlMixin using HTMLElement', () => {
       el.value = 'abcd';
       expect(el.validity.valid).to.be.false;
       expect(el.validity.rangeOverflow).to.be.true;
-      expect(el.internals.validationMessage).to.equal('Please use no more than 3 characters (you are currently using 4 characters).');
+      expect(el.internals.validationMessage).to.equal(
+        'Please use no more than 3 characters (you are currently using 4 characters).'
+      );
       el.value = 'abc';
       expect(el.validity.valid).to.be.true;
       expect(el.validity.rangeOverflow).to.be.false;
@@ -132,7 +146,9 @@ describe('The FormControlMixin using HTMLElement', () => {
       el.value = 'abcd';
       expect(el.validity.valid).to.be.false;
       expect(el.validity.rangeOverflow).to.be.true;
-      expect(el.internals.validationMessage).to.equal('Please use no more than 3 characters (you are currently using 4 characters).');
+      expect(el.internals.validationMessage).to.equal(
+        'Please use no more than 3 characters (you are currently using 4 characters).'
+      );
       el.value = 'ab';
       expect(el.validity.valid).to.be.true;
       expect(el.validity.rangeOverflow).to.be.false;
@@ -173,27 +189,24 @@ describe('The FormControlMixin using HTMLElement', () => {
 export class NativeFormControl extends FormControlMixin(HTMLElement) {}
 export class ValidatedEl extends NativeFormControl {
   static get formControlValidators(): Validator[] {
-    return [
-      maxLengthValidator,
-      minLengthValidator,
-      patternValidator,
-      programmaticValidator,
-      requiredValidator
-    ];
+    return [maxLengthValidator, minLengthValidator, patternValidator, programmaticValidator, requiredValidator];
   }
 
+  #error: string | null = null;
 
-  #error: string|null = null;
-  #maxLength: number|null = null;
-  #minLength: number|null = null;
-  #pattern: string|null = null;
+  #maxLength: number | null = null;
+
+  #minLength: number | null = null;
+
+  #pattern: string | null = null;
+
   #required = false;
 
-  get error(): string|null {
+  get error(): string | null {
     return this.#error;
   }
 
-  set error(error: string|null) {
+  set error(error: string | null) {
     this.#error = error;
     if (error) {
       this.setAttribute('error', error);
@@ -202,11 +215,11 @@ export class ValidatedEl extends NativeFormControl {
     }
   }
 
-  get maxLength(): number|null {
+  get maxLength(): number | null {
     return this.#maxLength;
   }
 
-  set maxLength(maxLength: number|null) {
+  set maxLength(maxLength: number | null) {
     this.#maxLength = maxLength;
     if (maxLength) {
       this.setAttribute('maxlength', maxLength.toString());
@@ -215,11 +228,11 @@ export class ValidatedEl extends NativeFormControl {
     }
   }
 
-  get minLength(): number|null {
+  get minLength(): number | null {
     return this.#minLength;
   }
 
-  set minLength(minLength: number|null) {
+  set minLength(minLength: number | null) {
     this.#minLength = minLength;
     if (minLength) {
       this.setAttribute('minlength', minLength.toString());
@@ -228,11 +241,11 @@ export class ValidatedEl extends NativeFormControl {
     }
   }
 
-  get pattern(): string|null {
+  get pattern(): string | null {
     return this.#pattern;
   }
 
-  set pattern(pattern: string|null) {
+  set pattern(pattern: string | null) {
     this.#pattern = pattern;
     if (pattern) {
       this.setAttribute('pattern', pattern);
@@ -260,7 +273,7 @@ export class ValidatedEl extends NativeFormControl {
 
   get validationTarget(): HTMLDivElement {
     return this.shadowRoot?.querySelector<HTMLDivElement>('div')!;
-  };
+  }
 }
 
 window.customElements.define('validated-el', ValidatedEl);

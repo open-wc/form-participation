@@ -3,7 +3,6 @@ import { Constructor, FormControlInterface, FormValue, IControlHost, Validator }
 
 export function FormControlMixin<T extends Constructor<HTMLElement & IControlHost>>(SuperClass: T) {
   class FormControl extends SuperClass {
-
     /** Wires up control instances to be form associated */
     static get formAssociated() {
       return true;
@@ -17,6 +16,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * be set to an invalid state.
      */
     declare static formControlValidators: Validator[];
+
     private static get validators(): Validator[] {
       return this.formControlValidators || [];
     }
@@ -263,11 +263,11 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
         if (this.constructor.prototype.hasOwnProperty('checked')) {
           descriptor = Object.getOwnPropertyDescriptor(this.constructor.prototype, 'checked');
         }
-        let get = descriptor && descriptor.get;
-        let set = descriptor && descriptor.set;
+        const get = descriptor && descriptor.get;
+        const set = descriptor && descriptor.set;
 
         /** Close over the initial value to use in the new getter/setter */
-        let checked = this.checked;
+        let {checked} = this;
 
         Object.defineProperty(this, 'checked', {
           get() {

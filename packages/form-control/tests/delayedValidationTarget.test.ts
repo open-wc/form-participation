@@ -1,10 +1,10 @@
 import { aTimeout, expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
 import sinon from 'sinon';
-import { FormControlMixin, Validator } from "../src";
+import { FormControlMixin, Validator } from '../src';
 
 describe('The FormControlMixin using HTMLElement', () => {
   let form: HTMLFormElement;
-  let el: DelayedTarget|NoTarget;
+  let el: DelayedTarget | NoTarget;
 
   describe('the delayed validationTarget scenario', () => {
     beforeEach(async () => {
@@ -65,13 +65,15 @@ describe('The FormControlMixin using HTMLElement', () => {
 export class NativeFormControl extends FormControlMixin(HTMLElement) {}
 export class DelayedTarget extends NativeFormControl {
   static get formControlValidators(): Validator[] {
-    return [{
-      key: 'customError',
-      message: 'always invalid',
-      callback(): boolean {
-        return false;
+    return [
+      {
+        key: 'customError',
+        message: 'always invalid',
+        callback(): boolean {
+          return false;
+        }
       }
-    }];
+    ];
   }
 
   constructor() {
@@ -96,13 +98,15 @@ export class DelayedTarget extends NativeFormControl {
 
 export class NoTarget extends NativeFormControl {
   static get formControlValidators(): Validator[] {
-    return [{
-      key: 'customError',
-      message: 'always invalid',
-      callback(): boolean {
-        return false;
+    return [
+      {
+        key: 'customError',
+        message: 'always invalid',
+        callback(): boolean {
+          return false;
+        }
       }
-    }];
+    ];
   }
 
   constructor() {

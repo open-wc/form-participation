@@ -7,7 +7,7 @@
  */
 export const submit = (form: HTMLFormElement): void => {
   if (!form.reportValidity()) {
-    return;
+    
   } else {
     const submitEvent = new Event('submit', {
       cancelable: true
@@ -33,7 +33,7 @@ export const formValues = (form: HTMLFormElement): Record<string, FormValue> => 
   const formData = new FormData(form);
   const values: Record<string, FormValue> = {};
 
-  for (let [key, value] of formData.entries()) {
+  for (const [key, value] of formData.entries()) {
     if (!values.hasOwnProperty(key)) {
       values[key] = value;
     } else if (Array.isArray(values[key])) {

@@ -62,6 +62,4 @@ describe('The submit form helper', () => {
 
     expect(formSubmitStub.callCount).to.equal(0);
   });
-
-
 });

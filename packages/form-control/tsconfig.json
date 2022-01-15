@@ -4,14 +4,6 @@
     "composite": true,
     "experimentalDecorators": true
   },
-  "include": [
-    "src/*.ts",
-    "*.js",
-    "tests/*.ts",
-    "demo/*.ts"
-  ],
-  "exclude": [
-    "dist",
-    "types"
-  ]
+  "include": ["src/*.ts", "*.js", "tests/*.ts", "demo/*.ts"],
+  "exclude": ["dist", "types"]
 }
