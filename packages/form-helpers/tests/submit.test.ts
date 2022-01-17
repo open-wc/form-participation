@@ -1,3 +1,4 @@
+import 'element-internals-polyfill';
 import { aTimeout, expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
 import * as sinon from 'sinon';
 import { submit } from '../src';
