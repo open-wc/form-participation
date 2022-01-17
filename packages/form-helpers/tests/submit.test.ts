@@ -7,7 +7,7 @@ const submitCallbackPrevented = (event: Event) => {
   event.preventDefault();
   submitted = true;
 };
-const submitCallback = (event: Event) => {
+const submitCallback = () => {
   submitted = true;
 };
 
@@ -19,7 +19,7 @@ describe('The submit form helper', () => {
     form = await fixture<HTMLFormElement>(html`<form @submit="${submitCallback}">
       <input>
     </form>`);
-    formSubmitStub = sinon.stub(form, 'submit').callsFake(() => {});
+    formSubmitStub = sinon.stub(form, 'submit').callsFake(() => { return false; });
     submitted = false;
   });
 
@@ -32,7 +32,6 @@ describe('The submit form helper', () => {
     submit(form);
     await aTimeout(0);
     expect(submitted).to.be.true;
-    // form.submit() is called
     expect(formSubmitStub.callCount).to.equal(1);
   });
 
@@ -56,7 +55,7 @@ describe('The submit form helper', () => {
       <input>
     </form>`);
 
-    formSubmitStub = sinon.stub(form, 'submit').callsFake(() => {});
+    formSubmitStub = sinon.stub(form, 'submit').callsFake(() => { return false; });
 
     submit(form);
 

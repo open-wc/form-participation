@@ -58,11 +58,11 @@ export const formValues = (form: HTMLFormElement): Record<string, FormValue> => 
  * in declaratively in HTML.
  *
  * @param form {HTMLFormElement} - The form to grab values from
- * @returns {Object<any, any>} - An object representation of the form
+ * @returns {Object<string, FormValue>} - An object representation of the form
  */
 export const parseFormAsObject = (form: HTMLFormElement): Record<string, FormValue> => {
   const data = formValues(form);
-  const output: Record<any, any> = {};
+  const output: Record<string, FormValue> = {};
 
   Object.entries(data).forEach(([key, value]) => {
     /** If the key has a '.', parse it as an object */
@@ -73,8 +73,8 @@ export const parseFormAsObject = (form: HTMLFormElement): Record<string, FormVal
 
       while (path.length) {
         const key = path.shift();
-        pointer[key as string] = pointer[key as string] || {};
-        pointer = pointer[key as string];
+        pointer[key as string] = pointer[key as string] || ({} as FormValue);
+        pointer = pointer[key as string] as unknown as Record<string, FormValue>;
       }
 
       pointer[destination as string] = value;
