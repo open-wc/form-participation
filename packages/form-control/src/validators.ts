@@ -1,11 +1,11 @@
 import { Validator } from './index';
-import { FormControlInterface } from './types';
+import { FormControlInterface, FormValue } from './types';
 
 export const requiredValidator: Validator = {
   attribute: 'required',
   key: 'valueMissing',
   message: 'Please fill out this field',
-  callback(instance: HTMLElement & { required: boolean }, value: any): boolean {
+  callback(instance: HTMLElement & { required: boolean }, value: FormValue): boolean {
     let valid = true;
 
     if ((instance.hasAttribute('required') || instance.required) && !value) {
@@ -30,9 +30,10 @@ export const minLengthValidator: Validator = {
   attribute: 'minlength',
   key: 'rangeUnderflow',
   message(instance: FormControlInterface & { minLength: number }): string {
-    return `Please use at least ${instance.minLength} characters (you are currently using ${instance.value.length} characters).`;
+    const value = instance.value as string || '';
+    return `Please use at least ${instance.minLength} characters (you are currently using ${value.length} characters).`;
   },
-  callback(instance: HTMLElement & { minLength: number }, value): boolean {
+  callback(instance: HTMLElement & { minLength: number }, value: string): boolean {
     /** If no value is provided, this validator should return true */
     if (!value) {
       return true;
@@ -52,11 +53,12 @@ export const maxLengthValidator: Validator = {
   message(
     instance: FormControlInterface & { maxLength: number }
   ): string {
-    return `Please use no more than ${instance.maxLength} characters (you are currently using ${instance.value.length} characters).`;
+    const value = instance.value as string || '';
+    return `Please use no more than ${instance.maxLength} characters (you are currently using ${value.length} characters).`;
   },
   callback(
     instance: HTMLElement & { maxLength: number },
-    value: any
+    value: string
   ): boolean {
     /** If maxLength isn't set, this is valid */
     if (!instance.maxLength) {
@@ -75,7 +77,7 @@ export const patternValidator: Validator = {
   attribute: 'pattern',
   key: 'patternMismatch',
   message: 'Please match the requested format',
-  callback(instance: HTMLElement & { pattern: string }, value): boolean {
+  callback(instance: HTMLElement & { pattern: string }, value: string): boolean {
     /** If no value is provided, this validator should return true */
     if (!value || !instance.pattern) {
       return true;

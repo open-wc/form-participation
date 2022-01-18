@@ -1,6 +1,6 @@
 # @open-wc/form-utils
-A collection of form control related utilities for working with forms.
 
+A collection of form control related utilities for working with forms.
 
 ## Install
 
@@ -13,16 +13,19 @@ yarn add @open-wc/form-helpers
 ```
 
 ### Implicit form submit
+
 The `submit` helper is a useful helper for firing the forms `submit` event – as a preventable event – only when the form's validity reports back as truthy (meaning the form has all valid values in its inputs) and calling the provided form's `submit()` method if the submit event is not `defaultPrevented`.
 
 It is perhaps best used to add implicit form submission to inputs in a form when the `Enter` key is pressed so that any input can submit a form. Such a feature can be useful for search inputs with no submit button.
 
 > This helper is somewhat of a stop gap method until Safari implements [HTMLFormElement.requestSubmit()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/requestSubmit)
+
 ```html
 <form id="someForm" @submit="${submitHandler}">
   <input required>
 </form>
 ```
+
 ```js
 import { submit } from '@open-wc/form-helpers';
 
@@ -44,6 +47,7 @@ function submitHandler(event) {
 ```
 
 ### Parse form values
+
 The `formValues` helper is a useful function for parsing out the values of a form's inputs in an object format.
 
 ```js
@@ -51,6 +55,7 @@ import { formValues } from '@open-wc/form-helpers';
 ```
 
 Given a form like:
+
 ```html
 <form>
   <input name="foo" value="one">
@@ -69,15 +74,16 @@ const form = document.querySelector('form');
 
 console.log(formValues(form))
 
-// Output: 
+// Output:
 // {
-//   foo: 'one', 
+//   foo: 'one',
 //   bar: 'two',
 //   baz: ['1', '2']
 // }
 ```
 
 ### Parse form object
+
 The `parseFormObject` helper enables deeper nesting and organization of inputs in a form by inspecting the `name` attribute on each input element and analyzing according to dot notation.
 
 ```js
@@ -85,6 +91,7 @@ import { parseFormAsObject } from '@open-wc/form-helpers';
 ```
 
 Given a form like
+
 ```html
 <form>
   <input name="one.a" value="a">
@@ -96,7 +103,9 @@ Given a form like
   <input name="three" value="tres">
 </form>
 ```
+
 parsing the form values as a deeply nested object can be perfomed as such:
+
 ```js
 import { parseFormAsObject } from '@open-wc/form-helpers';
 
@@ -104,7 +113,7 @@ const form = document.querySelector('form');
 
 console.log(parseFormAsObject(form))
 
-// Output: 
+// Output:
 // {
 //   one: {
 //     a: 'a',

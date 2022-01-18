@@ -1,9 +1,10 @@
 import { IElementInternals } from 'element-internals-polyfill';
 import { Constructor, FormControlInterface, FormValue, IControlHost, Validator } from './types';
 
-export function FormControlMixin<T extends Constructor<HTMLElement & IControlHost>>(SuperClass: T) {
+export function FormControlMixin<
+  TBase extends Constructor<HTMLElement & IControlHost> & { observedAttributes: string[] }
+>(SuperClass: TBase) {
   class FormControl extends SuperClass {
-
     /** Wires up control instances to be form associated */
     static get formAssociated() {
       return true;
@@ -17,6 +18,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * be set to an invalid state.
      */
     declare static formControlValidators: Validator[];
+
     private static get validators(): Validator[] {
       return this.formControlValidators || [];
     }
@@ -30,12 +32,11 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
     static get observedAttributes(): string[] {
       const validatorAttributes = this.validators.map((validator) => validator.attribute);
 
-      /** @ts-ignore This exits */
       const observedAttributes = super.observedAttributes || [];
 
       /** Make sure there are no duplicates inside the attributes list */
       const attributeSet = new Set([...observedAttributes, ...validatorAttributes]);
-      return [...attributeSet];
+      return [...attributeSet] as string[];
     }
 
     /**
@@ -130,6 +131,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
       return this.internals.validity;
     }
 
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
     constructor(...args: any[]) {
       super(...args);
       this.addEventListener('focus', this.#onFocus);
@@ -159,7 +161,9 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
       /** Initialize the form control and perform initial validation */
       this.#initFormControl();
       this.#validate(this.value);
-      this.validationMessageCallback('');
+      if (this.validationMessageCallback) {
+        this.validationMessageCallback('');
+      }
     }
 
     disconnectedCallback() {
@@ -180,12 +184,6 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
     #initFormControl(): void {
       /** Closed over variable to track value changes */
       let value: FormValue = this.value || '';
-
-      /** Value getter reference within the closure */
-      let set: ((v: FormValue) => void) | undefined;
-
-      /** Value setter reference within the closure */
-      let get: ((v: FormValue) => void) | undefined;
 
       /** Look to see if '`checked'` is on the control's prototype */
       const hasChecked = this.#isCheckedElement;
@@ -210,15 +208,15 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
       }
 
       /** Make sure to defer to the parent */
-      set = descriptor && descriptor.set;
-      get = descriptor && descriptor.get;
+      const set = descriptor && descriptor.set;
+      const get = descriptor && descriptor.get;
 
       /** Define the FormControl's value property */
       Object.defineProperty(this, 'value', {
         get() {
           /** If a getter already exists, make sure to call it */
           if (get) {
-            return get.call(this, null);
+            return get.call(this);
           }
           return value;
         },
@@ -263,11 +261,11 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
         if (this.constructor.prototype.hasOwnProperty('checked')) {
           descriptor = Object.getOwnPropertyDescriptor(this.constructor.prototype, 'checked');
         }
-        let get = descriptor && descriptor.get;
-        let set = descriptor && descriptor.set;
+        const get = descriptor && descriptor.get;
+        const set = descriptor && descriptor.set;
 
         /** Close over the initial value to use in the new getter/setter */
-        let checked = this.checked;
+        let {checked} = this;
 
         Object.defineProperty(this, 'checked', {
           get() {
@@ -312,7 +310,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * in cases where `checked` is present upon initialization, this will be
      * effectively `this.checked && this.value`.
      */
-    valueChangedCallback(value: FormValue): void {}
+    declare valueChangedCallback: (value: FormValue) => void;
 
     /**
      * Resets a form control to its initial state
@@ -375,7 +373,9 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
         this.#forceError = true;
       }
       const showError = this.#shouldShowError();
-      this.validationMessageCallback(showError ? this.validationMessage : '');
+      if (this.validationMessageCallback) {
+        this.validationMessageCallback(showError ? this.validationMessage : '');
+      }
     };
 
     /**
@@ -400,7 +400,9 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
       }
       this.#validate(value);
       const showError = this.#shouldShowError();
-      this.validationMessageCallback(showError ? this.validationMessage : '');
+      if (this.validationMessageCallback) {
+        this.validationMessageCallback(showError ? this.validationMessage : '');
+      }
     }
 
     /**
@@ -443,7 +445,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
            * if a control has a ValidityCallback, it can override the error
            * message for a given validity key.
            */
-          if (this.validityCallback(key)) {
+          if (this.validityCallback && this.validityCallback(key)) {
             messageResult = this.validityCallback(key) as string;
           } else if (message instanceof Function) {
             messageResult = message(this, value);
@@ -508,14 +510,14 @@ export function FormControlMixin<T extends Constructor<HTMLElement & IControlHos
      * The returned value will be used as the validationMessage for the given key.
      * @param validationKey {string} - The key that has returned invalid
      */
-    validityCallback(validationKey: string): string | void {}
+    declare validityCallback: (validationKey: string) => string | void;
 
     /**
      * Called when the control's validationMessage should be changed
      * @param message { string } - The new validation message
      */
-    validationMessageCallback(message: string): void {}
+    declare validationMessageCallback: (message: string) => void;
   }
 
-  return FormControl as Constructor<FormControlInterface> & T;
+  return FormControl as Constructor<FormControlInterface> & TBase;
 }

@@ -1,5 +1,5 @@
 import { aTimeout, expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
-import { FormControlMixin, Validator } from "../src";
+import { FormControlMixin, Validator } from '../src';
 
 let callCount = 0;
 let checkedCallCount = 0;
@@ -43,6 +43,7 @@ export class ValueSetter extends NativeFormControl {
   }
 
   #checked = false;
+
   _value = '';
 
   get value(): string {
@@ -50,10 +51,9 @@ export class ValueSetter extends NativeFormControl {
   }
 
   set value(val: string) {
-    this._value = val
+    this._value = val;
     callCount += 1;
   }
-
 
   get checked(): boolean {
     return this.#checked;
@@ -74,7 +74,7 @@ export class ValueSetter extends NativeFormControl {
 
   get validationTarget(): HTMLDivElement {
     return this.shadowRoot?.querySelector<HTMLDivElement>('div')!;
-  };
+  }
 }
 
 window.customElements.define('value-setter', ValueSetter);

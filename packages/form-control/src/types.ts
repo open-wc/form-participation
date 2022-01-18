@@ -1,7 +1,8 @@
 import { IElementInternals } from 'element-internals-polyfill';
 
 /** Generic constructor type */
-export type Constructor<T = {}> = new (...args: any[]) => T;
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+export type Constructor<T = Record<string, unknown>> = new (...args: any[]) => T;
 
 /** Union type for form values */
 export type FormValue = File|FormData|string|null;
@@ -10,7 +11,7 @@ export type FormValue = File|FormData|string|null;
 export interface FormControlInterface {
   checked?: boolean;
   validationTarget?: HTMLElement | null;
-  value: any;
+  value: FormValue;
   readonly form: HTMLFormElement;
   readonly internals: IElementInternals;
   readonly showError: boolean;
@@ -20,7 +21,7 @@ export interface FormControlInterface {
   checkValidity(): boolean;
   formResetCallback(): void;
   resetFormControl(): void;
-  valueChangedCallback(value: any): void;
+  valueChangedCallback(value: FormValue): void;
   validityCallback(validationKey: string): string | void;
   validationMessageCallback(message: string): void;
 }
@@ -64,22 +65,22 @@ export interface Validator {
    * ValidityState key as an argument and must return a validationMessage
    * for the given instance.
    */
-  message: string | ((instance: any, value: any) => string);
+  message: string | ((instance: any, value: FormValue) => string);
 
   /**
    * Callback for a given validator. Takes the FormControl instance
    * and the form control value as arguments and returns a
    * boolean to evaluate for that Validator.
    * @param instance {FormControlInterface} - The FormControl instance
-   * @param value {any} - The form control value
+   * @param value {FormValue} - The form control value
    * @returns {boolean} - The validity of a given Validator
    */
-  callback(instance: HTMLElement, value: any): boolean;
+  callback(instance: HTMLElement, value: FormValue): boolean;
 }
 
 /** Generic type to allow usage of HTMLElement lifecycle methods */
 export interface IControlHost {
-  attributeChangedCallback?(name: string, oldValue: any, newValue: any): void;
+  attributeChangedCallback?(name: string, oldValue: string, newValue: string): void;
   connectedCallback?(): void;
   disconnectedCallback?(): void;
   checked?: boolean;

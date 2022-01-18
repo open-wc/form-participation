@@ -1,5 +1,5 @@
 import { expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
-import { FormControlMixin } from "../src";
+import { FormControlMixin } from '../src';
 
 describe('The FormControlMixin using HTMLElement', () => {
   let form: HTMLFormElement;
@@ -129,6 +129,7 @@ export class ValueSet extends NativeFormControl {
 }
 export class ValueSetChecked extends ValueSet {
   checked = false;
+
   value = 'foo';
 }
 

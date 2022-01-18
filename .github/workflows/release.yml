@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    # Prevents changesets action from creating a PR on forks
+    if: github.repository == 'open-wc/form-participation'
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
+        with:
+          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
+          fetch-depth: 0
+
+      - name: Setup Node 16.x
+        uses: actions/setup-node@master
+        with:
+          node-version: 16.x
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Build packages
+        run: npx lerna run build
+
+      - name: Lint
+        run: yarn lint:ci
+
+      - name: Test
+        run: yarn test
+
+      - name: Setup Git User
+        run: |
+          git config --global user.email "hello@modern-web.dev"
+          git config --global user.name "Modern Web"
+
+      - name: Version
+        run: yarn changeset version
+
+      - name: Publish
+        run: yarn changeset publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Prep Commit Back
+        # only add modifications (changelog, package.json) and deletions (changeset .md)
+        run: |
+          git add -u
+          git commit -m "[skip ci] Automated version bump"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

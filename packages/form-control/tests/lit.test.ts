@@ -1,9 +1,9 @@
 import { aTimeout, elementUpdated, expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
 import { LitElement, TemplateResult } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
-import { live } from 'lit/directives/live.js'
+import { live } from 'lit/directives/live.js';
 import { sendKeys } from '@web/test-runner-commands';
-import { FormControlMixin, requiredValidator, Validator } from "../src";
+import { FormControlMixin, requiredValidator, Validator } from '../src';
 
 describe('The FormControlMixin using LitElement', () => {
   let form: HTMLFormElement;
@@ -25,7 +25,7 @@ describe('The FormControlMixin using LitElement', () => {
     el.validationTarget?.focus();
     await sendKeys({ type: 'Hello world' });
     await elementUpdated(el);
-    let data = new FormData(form);
+    const data = new FormData(form);
     expect(el.value).to.equal('Hello world');
     expect(data.get(el.name)).to.equal(el.value);
   });
@@ -67,10 +67,10 @@ export class LitControl extends FormControlMixin(LitElement) {
       @input="${this.#onInput}"
       ?required="${live(this.required)}"
       .value="${live(this.value)}"
-    >`
+    >`;
   }
 
-  #onInput(event: KeyboardEvent & { target: HTMLInputElement}) {
+  #onInput(event: KeyboardEvent & { target: HTMLInputElement }) {
     this.value = event.target.value;
   }
 
