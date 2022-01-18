@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   release:
@@ -35,11 +35,6 @@ jobs:
 
       - name: Test
         run: yarn test
-
-      - name: Setup Git User
-        run: |
-          git config --global user.email "hello@modern-web.dev"
-          git config --global user.name "Modern Web"
 
       - name: Version
         run: yarn changeset version
