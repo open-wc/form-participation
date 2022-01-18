@@ -1,33 +1,33 @@
 {
-    "name": "@open-wc/form-control",
-    "version": "0.0.2",
-    "description": "Base class for creating form-participating custom elements",
-    "main": "index.js",
-    "module": "index.js",
-    "exports": {
-      ".": "./index.js",
-      "./validators": "./src/validators.js",
-      "./types": "./src/types.js"
-    },
-    "files": [
-      "src/*.js",
-      "index.js",
-      "*.d.ts",
-      "*.js.map"
-    ],
-    "scripts": {
-      "build": "tsc --project tsconfig.build.json",
-      "start": "web-dev-server --node-resolve --watch",
-      "test": "web-test-runner tests/*.test.ts --node-resolve --coverage",
-      "test:playwright": "web-test-runner tests/*.test.ts --node-resolve --playwright --browsers chromium firefox webkit"
-    },
-    "contributors": [
-      "Caleb D. Williams <caleb.d.williams@gmail.com>",
-      "Michael Warren <michaelwarren1106@gmail.com>"
-    ],
-    "license": "MIT",
-    "peerDependencies": {
-      "element-internals-polyfill": "^0.1.47"
-    },
-    "sideEffects": false
-  }
+  "name": "@open-wc/form-control",
+  "version": "0.0.3",
+  "description": "Base class for creating form-participating custom elements",
+  "main": "index.js",
+  "module": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./validators": "./src/validators.js",
+    "./types": "./src/types.js"
+  },
+  "files": [
+    "src/*.js",
+    "index.js",
+    "*.d.ts",
+    "*.js.map"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "start": "web-dev-server --node-resolve --watch",
+    "test": "web-test-runner tests/*.test.ts --node-resolve --coverage",
+    "test:playwright": "web-test-runner tests/*.test.ts --node-resolve --playwright --browsers chromium firefox webkit"
+  },
+  "contributors": [
+    "Caleb D. Williams <caleb.d.williams@gmail.com>",
+    "Michael Warren <michaelwarren1106@gmail.com>"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "element-internals-polyfill": "^0.1.47"
+  },
+  "sideEffects": false
+}

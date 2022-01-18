@@ -1,28 +1,28 @@
 {
-    "name": "@open-wc/form-helpers",
-    "version": "0.0.2",
-    "description": "Helpers for working with forms",
-    "main": "index.js",
-    "module": "index.js",
-    "exports": {
-      ".": "./index.js"
-    },
-    "files": [
-      "src/*.js",
-      "index.js",
-      "*.d.ts",
-      "*.js.map"
-    ],
-    "scripts": {
-      "build": "tsc",
-      "start": "web-dev-server --node-resolve --watch",
-      "test": "web-test-runner tests/*.test.ts --node-resolve --coverage",
-      "test:playwright": "web-test-runner tests/*.test.ts --node-resolve --playwright --browsers chromium firefox webkit"
-    },
-    "contributors": [
-      "Caleb D. Williams <caleb.d.williams@gmail.com>",
-      "Michael Warren <michaelwarren1106@gmail.com>"
-    ],
-    "license": "MIT",
-    "sideEffects": false
-  }
+  "name": "@open-wc/form-helpers",
+  "version": "0.0.3",
+  "description": "Helpers for working with forms",
+  "main": "index.js",
+  "module": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": [
+    "src/*.js",
+    "index.js",
+    "*.d.ts",
+    "*.js.map"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "web-dev-server --node-resolve --watch",
+    "test": "web-test-runner tests/*.test.ts --node-resolve --coverage",
+    "test:playwright": "web-test-runner tests/*.test.ts --node-resolve --playwright --browsers chromium firefox webkit"
+  },
+  "contributors": [
+    "Caleb D. Williams <caleb.d.williams@gmail.com>",
+    "Michael Warren <michaelwarren1106@gmail.com>"
+  ],
+  "license": "MIT",
+  "sideEffects": false
+}
