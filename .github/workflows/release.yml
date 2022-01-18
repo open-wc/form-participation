@@ -47,6 +47,8 @@ jobs:
       - name: Prep Commit Back
         # only add modifications (changelog, package.json) and deletions (changeset .md)
         run: |
+          git config user.email "you@example.com"
+          git config user.name "Open Web Components"
           git add -u
           git commit -m "[skip ci] Automated version bump" --author "Open WC <>"
           git push origin main
