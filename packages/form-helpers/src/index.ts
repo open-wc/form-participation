@@ -6,9 +6,7 @@
  * @param form {HTMLFormElement} - A form to implicitly submit
  */
 export const submit = (form: HTMLFormElement): void => {
-  if (form.requestSubmit) {
-    form.requestSubmit();
-  } else if (!form.reportValidity()) {
+  if (!form.reportValidity()) {
     return;
   } else {
     const submitEvent = new Event('submit', {
