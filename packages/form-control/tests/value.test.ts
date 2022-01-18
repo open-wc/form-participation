@@ -72,7 +72,7 @@ describe('The FormControlMixin using HTMLElement', () => {
   describe('no checked prperty', () => {
     it('will intialize without a value', async () => {
       const data = new FormData(form);
-      expect(data.get('formControl')).to.be.null;
+      expect(data.get('formControlChecked')).to.be.null;
     });
 
     it('will set the value on the form when the host value is set', async () => {
@@ -113,7 +113,20 @@ describe('The FormControlMixin using HTMLElement', () => {
   });
 });
 
+describe('The FormControlMixin with an initial value', () => {
+  it('will accept the initial value', async () => {
+    const form = await fixture<HTMLFormElement>(html`<form>
+      <default-value name="foo"></default-value>
+    </form>`);
+
+    expect(new FormData(form).get('foo')).to.equal('bar');
+  });
+});
+
 export class NativeFormControl extends FormControlMixin(HTMLElement) {}
+export class DefaultValue extends NativeFormControl {
+  value = 'bar';
+}
 export class ValueSet extends NativeFormControl {
   constructor() {
     super();
@@ -135,3 +148,4 @@ export class ValueSetChecked extends ValueSet {
 
 window.customElements.define('value-set', ValueSet);
 window.customElements.define('value-set-checked', ValueSetChecked);
+window.customElements.define('default-value', DefaultValue);

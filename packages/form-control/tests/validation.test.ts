@@ -118,9 +118,9 @@ describe('The FormControlMixin using HTMLElement', () => {
     });
 
     it('will call the validator on attribute change', async () => {
-      expect(callCount).to.equal(1);
+      expect(callCount, 'first').to.equal(1);
       noopEl.toggleAttribute('noop', true);
-      expect(callCount).to.equal(2);
+      expect(callCount, 'second').to.equal(2);
     });
   });
 });

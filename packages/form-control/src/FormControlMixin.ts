@@ -2,7 +2,7 @@ import { IElementInternals } from 'element-internals-polyfill';
 import { Constructor, FormControlInterface, FormValue, IControlHost, Validator } from './types';
 
 export function FormControlMixin<
-  TBase extends Constructor<HTMLElement & IControlHost> & { observedAttributes: string[] }
+  TBase extends Constructor<HTMLElement & IControlHost> & { observedAttributes?: string[] }
 >(SuperClass: TBase) {
   class FormControl extends SuperClass {
     /** Wires up control instances to be form associated */
@@ -160,10 +160,6 @@ export function FormControlMixin<
 
       /** Initialize the form control and perform initial validation */
       this.#initFormControl();
-      this.#validate(this.value);
-      if (this.validationMessageCallback) {
-        this.validationMessageCallback('');
-      }
     }
 
     disconnectedCallback() {
@@ -224,18 +220,7 @@ export function FormControlMixin<
           /** Save a reference to the new value to use later if necessary */
           value = newValue;
 
-          /**
-           * If the control has a checked property, make sure that it is
-           * truthy before setting the form control value. If it is falsy,
-           * remove the form control value.
-           */
-          if (this.#isCheckedElement && this.checked) {
-            this.#setValue(newValue);
-          } else if (this.#isCheckedElement && !this.checked) {
-            this.#setValue(null);
-          } else {
-            this.#setValue(newValue);
-          }
+          this.#commitValue(newValue);
 
           /** If a setter already exists, make sure to call it */
           if (set) {
@@ -294,6 +279,8 @@ export function FormControlMixin<
           }
         });
       }
+
+      this.#commitValue(value);
     }
 
     /** Reset control state when the form is reset */
@@ -324,6 +311,21 @@ export function FormControlMixin<
       this.#touched = false;
       this.#forceError = false;
       this.#shouldShowError();
+    }
+
+    /**
+     * If the control has a checked property, make sure that it is
+     * truthy before setting the form control value. If it is falsy,
+     * remove the form control value.
+     */
+    #commitValue(value: FormValue): void {
+      if (this.#isCheckedElement && this.checked) {
+        this.#setValue(value);
+      } else if (this.#isCheckedElement && !this.checked) {
+        this.#setValue(null);
+      } else {
+        this.#setValue(value);
+      }
     }
 
     /**
