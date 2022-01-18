@@ -21,12 +21,12 @@ describe('The FormControlMixin using HTMLElement', () => {
 
     afterEach(fixtureCleanup);
 
-    it('will wait for the validaitonTarget to be set', async () => {
+    it('will wait for the validationTarget to be set', async () => {
       expect(el.validationTarget).to.be.undefined;
       expect(el.validity.valid).to.be.false;
       await aTimeout(100);
-      form.requestSubmit();
-      expect(document.activeElement?.shadowRoot?.activeElement).to.equal(el.validationTarget);
+
+      expect(el.validationTarget).not.to.be.undefined;
     });
   });
 
