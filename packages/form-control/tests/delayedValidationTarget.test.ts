@@ -21,7 +21,10 @@ describe('The FormControlMixin using HTMLElement', () => {
 
     afterEach(fixtureCleanup);
 
-    it('will wait for the validaitonTarget to be set', async () => {
+    // TODO: this test randomly failed in CI builds
+    // but has never failed locally. Troubleshoot a possible race condition
+    
+    it('will wait for the validationTarget to be set', async () => {
       expect(el.validationTarget).to.be.undefined;
       expect(el.validity.valid).to.be.false;
       await aTimeout(100);
