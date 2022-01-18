@@ -48,7 +48,7 @@ jobs:
         # only add modifications (changelog, package.json) and deletions (changeset .md)
         run: |
           git add -u
-          git commit -m "[skip ci] Automated version bump"
+          git commit -m "[skip ci] Automated version bump" --author "Open WC <>"
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
