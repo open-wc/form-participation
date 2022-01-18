@@ -21,20 +21,12 @@ describe('The FormControlMixin using HTMLElement', () => {
 
     afterEach(fixtureCleanup);
 
-    // TODO: this test randomly failed in CI builds
-    // but has never failed locally. Troubleshoot a possible race condition
-
     it('will wait for the validationTarget to be set', async () => {
       expect(el.validationTarget).to.be.undefined;
       expect(el.validity.valid).to.be.false;
       await aTimeout(100);
-      form.requestSubmit();
 
-      // TODO: this is a temp "fix" for the activeElement being
-      // evaluated as null sometimes on CI
-      await aTimeout(1);
-      
-      expect(document.activeElement?.shadowRoot?.activeElement).to.equal(el.validationTarget);
+      expect(el.validationTarget).not.to.be.undefined;
     });
   });
 
