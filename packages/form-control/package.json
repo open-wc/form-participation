@@ -11,6 +11,8 @@
   },
   "files": [
     "src/*.js",
+    "src/*.d.ts",
+    "src/*.js.map",
     "index.js",
     "*.d.ts",
     "*.js.map"
