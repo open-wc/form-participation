@@ -19,6 +19,13 @@ export function FormControlMixin<
      */
     declare static formControlValidators: Validator[];
 
+    /**
+     * If set to true the control described should be evaluated and validated
+     * as part of a group. Like a radio, if any member of the group's validity
+     * changes the the other members should update as well.
+     */
+    declare static formControlValidationGroup: boolean;
+
     private static get validators(): Validator[] {
       return this.formControlValidators || [];
     }
@@ -72,6 +79,13 @@ export function FormControlMixin<
     /** Will return true if the control has a checked property */
     get #isCheckedElement(): boolean {
       return this.hasOwnProperty('checked') || this.constructor.prototype.hasOwnProperty('checked');
+    }
+
+    /** All of the controls within a root with a matching local name and form name */
+    get #formValidationGroup(): NodeListOf<FormControl> {
+      const rootNode = this.getRootNode() as HTMLElement;
+      const selector = `${this.localName}[name="${this.getAttribute('name')}"]`;
+      return rootNode.querySelectorAll<FormControl>(selector);
     }
 
     /**
@@ -264,18 +278,20 @@ export function FormControlMixin<
             /** Updated closure value */
             checked = newChecked;
 
-            if (newChecked) {
-              /** If truthy, set the form value to the instance's value */
-              this.#setValue(this.value);
-            } else {
-              /** If falsy, remove the instance's form value */
-              this.#setValue(null);
-            }
-
             /** If a setter exists, use it */
             if (set) {
               set.call(this, newChecked);
             }
+
+            this.#commitValue(this.value);
+
+            // if (newChecked) {
+            //   /** If truthy, set the form value to the instance's value */
+            //   this.#commitValue(this.value);
+            // } else {
+            //   /** If falsy, remove the instance's form value */
+            //   this.#commitValue(null);
+            // }
           }
         });
       }
@@ -319,11 +335,17 @@ export function FormControlMixin<
      * remove the form control value.
      */
     #commitValue(value: FormValue): void {
+      console.log('commitValue', value, this, this.checked)
       if (this.#isCheckedElement && this.checked) {
+        console.log(1);
         this.#setValue(value);
       } else if (this.#isCheckedElement && !this.checked) {
+        console.log(2);
+
         this.#setValue(null);
       } else {
+        console.log(3);
+
         this.#setValue(value);
       }
     }
@@ -400,6 +422,7 @@ export function FormControlMixin<
       if (this.valueChangedCallback) {
         this.valueChangedCallback(value);
       }
+      console.log('validate', value)
       this.#validate(value);
       const showError = this.#shouldShowError();
       if (this.validationMessageCallback) {
@@ -470,14 +493,22 @@ export function FormControlMixin<
        */
       if (isValid) {
         this.internals.setValidity({});
+
+        /** If the element is part of a formControlValidationGroup, reset those values */
+        if (proto.formControlValidationGroup === true) {
+          this.#formValidationGroup.forEach(control => {
+            /** Don't duplicate effort */
+            if (control !== this) {
+              control.internals.setValidity({});
+            }
+          });
+        }
       } else if (this.validationTarget) {
         this.internals.setValidity(validity, validationMessage, this.validationTarget);
       } else {
         /**
          * If the validationTarget is not set, the user can decide how they would
          * prefer to handle focus when the field is validated.
-         *
-         * TODO: Document this edge case
          */
         this.internals.setValidity(validity, validationMessage);
 
