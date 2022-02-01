@@ -176,3 +176,41 @@ export const programaticValidator: Validator = {
   }
 };
 ```
+
+### Validating a control as a group
+
+It is possible to evaluate the validity of a set of controls as a group (similar to a radio button) where if one control in the group doesn't meet some criteria the validation fails. To enable this behavior, you need to set the components static property `formControlValidationGroup` to `true`. The following example emulates how the native `required` property interacts with `input[type="radio"]`.
+
+```typescript
+import { FormControlMixin } from '@open-wc/form-control';
+import { LitElement } from 'lit';
+import { customElement } from 'lit/decorators.js';
+
+@customElement('fc-radio')
+class FcRadio extends FormControlMixin(LitElement) {
+  /** Enable group validation behavior */
+  static formControlValidationGroup = true;
+
+  /** Custom validator logic */
+  static formControlValidators = [
+    {
+      attribute: 'required',
+      key: 'valueMissing',
+      message: 'Please select an item', 
+      callback(instance, value) {
+        const rootNode = instance.getRootNode();
+        const selector = `${instance.localName}[name="${instance.getAttribute('name')}"]`;
+        const group = Array.from(rootNode.querySelectorAll(selector));
+        const isChecked = group.some(instance => instance.checked);
+        const isRequired = group.some(instance => instance.required);
+        
+        if (isRequired && !isChecked) {
+          return false;
+        }
+        
+        return true;
+      }
+    }
+  ];
+}
+```
