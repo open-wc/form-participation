@@ -284,14 +284,6 @@ export function FormControlMixin<
             }
 
             this.#commitValue(this.value);
-
-            // if (newChecked) {
-            //   /** If truthy, set the form value to the instance's value */
-            //   this.#commitValue(this.value);
-            // } else {
-            //   /** If falsy, remove the instance's form value */
-            //   this.#commitValue(null);
-            // }
           }
         });
       }
