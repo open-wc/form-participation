@@ -335,17 +335,11 @@ export function FormControlMixin<
      * remove the form control value.
      */
     #commitValue(value: FormValue): void {
-      console.log('commitValue', value, this, this.checked)
       if (this.#isCheckedElement && this.checked) {
-        console.log(1);
         this.#setValue(value);
       } else if (this.#isCheckedElement && !this.checked) {
-        console.log(2);
-
         this.#setValue(null);
       } else {
-        console.log(3);
-
         this.#setValue(value);
       }
     }
@@ -422,7 +416,6 @@ export function FormControlMixin<
       if (this.valueChangedCallback) {
         this.valueChangedCallback(value);
       }
-      console.log('validate', value)
       this.#validate(value);
       const showError = this.#shouldShowError();
       if (this.validationMessageCallback) {
