@@ -78,7 +78,7 @@ export function FormControlMixin<
 
     /** Will return true if the control has a checked property */
     get #isCheckedElement(): boolean {
-      return this.hasOwnProperty('checked') || this.constructor.prototype.hasOwnProperty('checked');
+      return this.hasOwnProperty('checked') || Object.getPrototypeOf(this.constructor.prototype).hasOwnProperty('checked') || this.constructor.prototype.hasOwnProperty('checked');
     }
 
     /** All of the controls within a root with a matching local name and form name */
@@ -332,9 +332,8 @@ export function FormControlMixin<
      * remove the form control value.
      */
     #commitValue(value: FormValue): void {
-      if (this.#isCheckedElement && this.checked) {
-        this.#setValue(value);
-      } else if (this.#isCheckedElement && !this.checked) {
+      console.log('isChecked:', this.#isCheckedElement)
+      if (this.#isCheckedElement && !this.checked) {
         this.#setValue(null);
       } else {
         this.#setValue(value);
