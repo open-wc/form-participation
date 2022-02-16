@@ -78,7 +78,7 @@ export function FormControlMixin<
 
     /** Will return true if the control has a checked property */
     get #isCheckedElement(): boolean {
-      return this.hasOwnProperty('checked') || Object.getPrototypeOf(this.constructor.prototype).hasOwnProperty('checked') || this.constructor.prototype.hasOwnProperty('checked');
+      return 'checked' in this;
     }
 
     /** All of the controls within a root with a matching local name and form name */
@@ -269,7 +269,7 @@ export function FormControlMixin<
         const set = descriptor && descriptor.set;
 
         /** Close over the initial value to use in the new getter/setter */
-        let {checked} = this;
+        let { checked } = this;
 
         Object.defineProperty(this, 'checked', {
           get() {
