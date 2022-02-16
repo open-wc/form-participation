@@ -165,7 +165,12 @@ export function FormControlMixin<
       const validator = proto.getValidator(name);
 
       if (validator && this.validationTarget) {
-        this.#validate(this.value);
+        /** Determine the value to validate */
+        let valueToValidate: FormValue = this.value;
+        if (this.#isCheckedElement && !this.checked) {
+          valueToValidate = null;
+        }
+        this.#validate(valueToValidate);
       }
     }
 
