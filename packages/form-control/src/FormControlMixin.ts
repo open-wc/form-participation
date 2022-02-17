@@ -1,6 +1,14 @@
 import { IElementInternals } from 'element-internals-polyfill';
 import { Constructor, FormControlInterface, FormValue, IControlHost, Validator } from './types';
 
+/** Traverse the prototype chain to check for a property descriptor */
+function getPropertyDescriptor(object: IControlHost, key: string): PropertyDescriptor|null {
+  if (object.constructor === HTMLElement) {
+    return null;
+  }
+  return Object.getOwnPropertyDescriptor(object, key) || getPropertyDescriptor(Object.getPrototypeOf(object), key)
+}
+
 export function FormControlMixin<
   TBase extends Constructor<HTMLElement & IControlHost> & { observedAttributes?: string[] }
 >(SuperClass: TBase) {
@@ -211,16 +219,7 @@ export function FormControlMixin<
        * We do this to make sure that we don't overwrite behavior of an object
        * higher in the chain.
        */
-      let descriptor = Object.getOwnPropertyDescriptor(this, 'value');
-
-      /**
-       * Many libraries like Lit will write properties to the element's
-       * prototype. This will pull the get/set from the prototype descriptor
-       * if it is available.
-       */
-      if (Object.getOwnPropertyDescriptor(this.constructor.prototype, 'value')) {
-        descriptor = Object.getOwnPropertyDescriptor(this.constructor.prototype, 'value');
-      }
+      const descriptor = getPropertyDescriptor(this, 'value');
 
       /** Make sure to defer to the parent */
       const set = descriptor && descriptor.set;
@@ -261,10 +260,7 @@ export function FormControlMixin<
          * As with value, save a reference to the getter/setter if they already
          * exist in the prototype chain
          */
-        let descriptor = Object.getOwnPropertyDescriptor(this, 'checked');
-        if (this.constructor.prototype.hasOwnProperty('checked')) {
-          descriptor = Object.getOwnPropertyDescriptor(this.constructor.prototype, 'checked');
-        }
+        const descriptor = getPropertyDescriptor(this, 'checked');
         const get = descriptor && descriptor.get;
         const set = descriptor && descriptor.set;
 
@@ -332,7 +328,6 @@ export function FormControlMixin<
      * remove the form control value.
      */
     #commitValue(value: FormValue): void {
-      console.log('isChecked:', this.#isCheckedElement)
       if (this.#isCheckedElement && !this.checked) {
         this.#setValue(null);
       } else {
