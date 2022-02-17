@@ -5,7 +5,6 @@ import {
   minLengthValidator,
   patternValidator,
   programmaticValidator,
-  requiredCheckedValidator,
   requiredValidator,
   Validator
 } from '../src';
@@ -237,44 +236,6 @@ describe('The FormControlMixin using HTMLElement', () => {
   });
 });
 
-describe('requiredCheckedValidator', () => {
-  let form: HTMLFormElement;
-  let el: ValidatedCheckedEl;
-
-  beforeEach(async () => {
-    form = await fixture<HTMLFormElement>(html`<form>
-      <validated-checked-el name="el"></validated-checked-el>
-    </form>`);
-    el = form.querySelector<ValidatedCheckedEl>('validated-checked-el')!;
-  });
-
-  afterEach(fixtureCleanup);
-
-  it('will not affect validity if the required attribute is missing', async () => {
-    expect(el.validity.valid).to.be.true;
-  });
-
-  it('will invalidate the control if required and no value', async () => {
-    expect(el.validity.valid).to.be.true;
-    expect(el.validity.valueMissing).to.be.false;
-    el.toggleAttribute('required', true);
-    expect(el.validity.valid).to.be.false;
-    expect(el.validity.valueMissing).to.be.true;
-    expect(el.internals.validationMessage).to.equal('Please fill out this field');
-  });
-
-  it('will respond to value setting', async () => {
-    expect(el.validity.valid, '1').to.be.true;
-    expect(el.validity.valueMissing, '2').to.be.false;
-    el.toggleAttribute('required', true);
-    expect(el.validity.valid, '3').to.be.false;
-    expect(el.validity.valueMissing, '4').to.be.true;
-    el.checked = true;
-    expect(el.validity.valid, '5').to.be.true;
-    expect(el.validity.valueMissing, '6').to.be.false;
-  });
-});
-
 export class NativeFormControl extends FormControlMixin(HTMLElement) {}
 export class ValidatedEl extends NativeFormControl {
   static get formControlValidators(): Validator[] {
@@ -365,36 +326,4 @@ export class ValidatedEl extends NativeFormControl {
   }
 }
 
-export class ValidatedCheckedEl extends NativeFormControl {
-  static get formControlValidators(): Validator[] {
-    return [requiredCheckedValidator];
-  }
-
-  checked = false;
-  value = 'checked-el';
-  #required = false;
-
-  get required() {
-    return this.#required;
-  }
-
-  set required(required: boolean) {
-    this.#required = required;
-    this.toggleAttribute('required', required);
-  }
-
-  constructor() {
-    super();
-    const root = this.attachShadow({ mode: 'open' });
-    const validationTarget = document.createElement('div');
-    validationTarget.tabIndex = 0;
-    root.append(validationTarget);
-  }
-
-  get validationTarget(): HTMLDivElement {
-    return this.shadowRoot?.querySelector<HTMLDivElement>('div')!;
-  }
-}
-
 window.customElements.define('validated-el', ValidatedEl);
-window.customElements.define('validated-checked-el', ValidatedCheckedEl);

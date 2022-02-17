@@ -16,21 +16,6 @@ export const requiredValidator: Validator = {
   }
 };
 
-export const requiredCheckedValidator: Validator = {
-  attribute: 'required',
-  key: 'valueMissing',
-  message: 'Please fill out this field',
-  callback(instance: HTMLElement & { required: boolean, checked: boolean }): boolean {
-    let valid = true;
-
-    if (instance.hasAttribute('required') && !instance.checked) {
-      valid = false;
-    }
-
-    return valid;
-  }
-};
-
 export const programmaticValidator: Validator = {
   attribute: 'error',
   message(instance: HTMLElement & { error: string }): string {
