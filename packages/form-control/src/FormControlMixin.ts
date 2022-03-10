@@ -394,6 +394,7 @@ export function FormControlMixin<
     #onInvalid = (): void => {
       this.#forceError = true;
       this.#shouldShowError();
+      this?.validationMessageCallback?.(this.showError ? this.validationMessage : '');
     };
 
     /**
