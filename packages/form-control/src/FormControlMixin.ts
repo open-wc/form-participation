@@ -226,7 +226,7 @@ export function FormControlMixin<
       const get = descriptor && descriptor.get;
 
       /** Define the FormControl's value property */
-      Object.defineProperty(this, 'value', {
+      Object.defineProperty(this.hasOwnProperty('value') ? this :  this.constructor.prototype, 'value', {
         get() {
           /** If a getter already exists, make sure to call it */
           if (get) {
