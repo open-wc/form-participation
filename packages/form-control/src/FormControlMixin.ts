@@ -244,7 +244,9 @@ export function FormControlMixin<
           if (set) {
             set.call(this, newValue);
           }
-        }
+        },
+        // set configurable so that instance props can overwrite
+        configurable: true
       });
 
       /**
@@ -285,7 +287,9 @@ export function FormControlMixin<
             }
 
             this.#commitValue(this.value);
-          }
+          },
+          // set configurable so that instance props can overwrite
+          configurable: true
         });
       }
 
