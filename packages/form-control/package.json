@@ -1,6 +1,6 @@
 {
   "name": "@open-wc/form-control",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Base class for creating form-participating custom elements",
   "main": "index.js",
   "module": "index.js",
