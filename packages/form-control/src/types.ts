@@ -1,5 +1,3 @@
-import { IElementInternals } from 'element-internals-polyfill';
-
 /** Generic constructor type */
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 export type Constructor<T = Record<string, unknown>> = new (...args: any[]) => T;
@@ -11,19 +9,21 @@ export type FormValue = File|FormData|string|null;
 export interface FormControlInterface {
   checked?: boolean;
   validationTarget?: HTMLElement | null;
-  value: FormValue;
+  value?: FormValue;
   readonly form: HTMLFormElement;
-  readonly internals: IElementInternals;
+  readonly internals: ElementInternals;
   readonly showError: boolean;
   readonly validationMessage: string;
   readonly validity: ValidityState;
   connectedCallback(): void;
   checkValidity(): boolean;
   formResetCallback(): void;
-  resetFormControl(): void;
+  resetFormControl?(): void;
   valueChangedCallback(value: FormValue): void;
   validityCallback(validationKey: string): string | void;
   validationMessageCallback(message: string): void;
+  setValue?(value: FormValue): void;
+  shouldFormValueUpdate?(): boolean;
 }
 
 /**
@@ -86,3 +86,5 @@ export interface IControlHost {
   checked?: boolean;
   disabled?: boolean;
 }
+
+export type CustomValidityState = Partial<Record<keyof ValidityState, boolean>>;

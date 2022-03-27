@@ -28,8 +28,5 @@
     "Michael Warren <michaelwarren1106@gmail.com>"
   ],
   "license": "MIT",
-  "peerDependencies": {
-    "element-internals-polyfill": "^0.1.47"
-  },
   "sideEffects": false
 }

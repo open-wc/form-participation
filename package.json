@@ -35,7 +35,7 @@
     "@web/test-runner-commands": "^0.5.13",
     "@web/test-runner-playwright": "^0.8.8",
     "construct-style-sheets-polyfill": "^3.0.5",
-    "element-internals-polyfill": "^0.1.49",
+    "element-internals-polyfill": "^1.1.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
