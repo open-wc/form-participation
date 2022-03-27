@@ -8,7 +8,8 @@ form!.addEventListener('submit', (event: Event) => {
     litControl: data.get('lit-control'),
     legacyDemo: data.get('legacy-demo'),
     vanillaDemo: data.get('vanilla-demo'),
-    switch: data.get('switch')
+    switch: data.get('switch'),
+    new: data.get('new')
   });
 });
 
