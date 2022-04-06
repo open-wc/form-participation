@@ -1,11 +1,12 @@
 import { expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
-import { FormControlMixin, Validator } from '../src';
+import { FormControlMixin, FormValue } from '../src';
+import { Validator } from '../src/types';
 
 let callCount = 0;
 const noopValidator: Validator = {
   key: 'customError',
   message: 'No op',
-  callback(instance, value) {
+  callback(instance: HTMLElement, value: FormValue) {
     callCount += 1;
     return value === 'valid';
   }
@@ -131,6 +132,8 @@ export class NoopValidatorEl extends NativeFormControl {
     return [noopValidator];
   }
 
+  _value: string|null = '';
+
   constructor() {
     super();
     const root = this.attachShadow({ mode: 'open' });
@@ -140,12 +143,20 @@ export class NoopValidatorEl extends NativeFormControl {
   }
 
   connectedCallback(): void {
-    super.connectedCallback();
     this.setAttribute('tabindex', '0');
   }
 
   get validationTarget(): HTMLDivElement {
-    return this.shadowRoot!.querySelector<HTMLDivElement>('div')!;
+    return this.shadowRoot?.querySelector<HTMLDivElement>('div')!;
+  }
+
+  get value() {
+    return this._value;
+  }
+
+  set value(_value) {
+    this._value = _value;
+    this.setValue(_value);
   }
 }
 

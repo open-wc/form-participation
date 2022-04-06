@@ -29,9 +29,9 @@ export const programmaticValidator: Validator = {
 export const minLengthValidator: Validator = {
   attribute: 'minlength',
   key: 'rangeUnderflow',
-  message(instance: FormControlInterface & { minLength: number }): string {
-    const value = instance.value as string || '';
-    return `Please use at least ${instance.minLength} characters (you are currently using ${value.length} characters).`;
+  message(instance: FormControlInterface & { minLength: number }, value: FormValue): string {
+    const _value = value as string || '';
+    return `Please use at least ${instance.minLength} characters (you are currently using ${_value.length} characters).`;
   },
   callback(instance: HTMLElement & { minLength: number }, value: string): boolean {
     /** If no value is provided, this validator should return true */
@@ -51,10 +51,11 @@ export const maxLengthValidator: Validator = {
   attribute: 'maxlength',
   key: 'rangeOverflow',
   message(
-    instance: FormControlInterface & { maxLength: number }
+    instance: FormControlInterface & { maxLength: number },
+    value: FormValue
   ): string {
-    const value = instance.value as string || '';
-    return `Please use no more than ${instance.maxLength} characters (you are currently using ${value.length} characters).`;
+    const _value = value as string || '';
+    return `Please use no more than ${instance.maxLength} characters (you are currently using ${_value.length} characters).`;
   },
   callback(
     instance: HTMLElement & { maxLength: number },

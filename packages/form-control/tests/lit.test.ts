@@ -1,4 +1,4 @@
-import { aTimeout, elementUpdated, expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
+import { elementUpdated, expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
 import { LitElement, TemplateResult } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { live } from 'lit/directives/live.js';
@@ -76,5 +76,11 @@ export class LitControl extends FormControlMixin(LitElement) {
 
   validityCallback(validationKey: string): string | void {
     return 'value missing';
+  }
+
+  updated(_changedProperties: Map<string, unknown>): void {
+    if (_changedProperties.has('value')) {
+      this.setValue(this.value);
+    }
   }
 }

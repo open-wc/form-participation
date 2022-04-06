@@ -1,3 +1,5 @@
+import { IElementInternals } from "element-internals-polyfill";
+
 /** Generic constructor type */
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 export type Constructor<T = Record<string, unknown>> = new (...args: any[]) => T;
@@ -7,11 +9,9 @@ export type FormValue = File|FormData|string|null;
 
 /** Interface of exported FormControl behavior */
 export interface FormControlInterface {
-  checked?: boolean;
   validationTarget?: HTMLElement | null;
-  value?: FormValue;
   readonly form: HTMLFormElement;
-  readonly internals: ElementInternals;
+  readonly internals: ElementInternals & IElementInternals;
   readonly showError: boolean;
   readonly validationMessage: string;
   readonly validity: ValidityState;
@@ -22,7 +22,7 @@ export interface FormControlInterface {
   valueChangedCallback(value: FormValue): void;
   validityCallback(validationKey: string): string | void;
   validationMessageCallback(message: string): void;
-  setValue?(value: FormValue): void;
+  setValue(value: FormValue): void;
   shouldFormValueUpdate?(): boolean;
 }
 

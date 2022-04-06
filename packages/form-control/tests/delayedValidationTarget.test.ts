@@ -88,7 +88,6 @@ export class DelayedTarget extends NativeFormControl {
   }
 
   connectedCallback(): void {
-    super.connectedCallback();
     this.tabIndex = 0;
     setTimeout(() => {
       this.validationTarget = this.shadowRoot?.querySelector('div');
@@ -112,6 +111,17 @@ export class NoTarget extends NativeFormControl {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+  }
+
+  private _value: string|null = null;
+
+  get value(): string|null {
+    return this._value;
+  }
+
+  set value(_value: string|null) {
+    this._value = _value;
+    this.setValue(_value);
   }
 }
 
