@@ -242,22 +242,24 @@ export class ValidatedEl extends NativeFormControl {
     return [maxLengthValidator, minLengthValidator, patternValidator, programmaticValidator, requiredValidator];
   }
 
-  #error: string | null = null;
+  _error: string | null = null;
 
-  #maxLength: number | null = null;
+  _maxLength: number | null = null;
 
-  #minLength: number | null = null;
+  _minLength: number | null = null;
 
-  #pattern: string | null = null;
+  _pattern: string | null = null;
 
-  #required = false;
+  _required = false;
+
+  _value: string|null = null;
 
   get error(): string | null {
-    return this.#error;
+    return this._error;
   }
 
   set error(error: string | null) {
-    this.#error = error;
+    this._error = error;
     if (error) {
       this.setAttribute('error', error);
     } else {
@@ -266,11 +268,11 @@ export class ValidatedEl extends NativeFormControl {
   }
 
   get maxLength(): number | null {
-    return this.#maxLength;
+    return this._maxLength;
   }
 
   set maxLength(maxLength: number | null) {
-    this.#maxLength = maxLength;
+    this._maxLength = maxLength;
     if (maxLength) {
       this.setAttribute('maxlength', maxLength.toString());
     } else {
@@ -279,11 +281,11 @@ export class ValidatedEl extends NativeFormControl {
   }
 
   get minLength(): number | null {
-    return this.#minLength;
+    return this._minLength;
   }
 
   set minLength(minLength: number | null) {
-    this.#minLength = minLength;
+    this._minLength = minLength;
     if (minLength) {
       this.setAttribute('minlength', minLength.toString());
     } else {
@@ -292,11 +294,11 @@ export class ValidatedEl extends NativeFormControl {
   }
 
   get pattern(): string | null {
-    return this.#pattern;
+    return this._pattern;
   }
 
   set pattern(pattern: string | null) {
-    this.#pattern = pattern;
+    this._pattern = pattern;
     if (pattern) {
       this.setAttribute('pattern', pattern);
     } else {
@@ -305,12 +307,21 @@ export class ValidatedEl extends NativeFormControl {
   }
 
   get required() {
-    return this.#required;
+    return this._required;
   }
 
   set required(required: boolean) {
-    this.#required = required;
+    this._required = required;
     this.toggleAttribute('required', required);
+  }
+
+  get value(): string|null {
+    return this._value;
+  }
+
+  set value(_value) {
+    this._value = _value;
+    this.setValue(_value);
   }
 
   constructor() {

@@ -1,151 +1,98 @@
-import { expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
+import { aTimeout, expect, fixture, fixtureCleanup, html, should } from '@open-wc/testing';
+import sinon from 'sinon';
 import { FormControlMixin } from '../src';
+
 
 describe('The FormControlMixin using HTMLElement', () => {
   let form: HTMLFormElement;
-  let el: ValueSet;
-  let elChecked: ValueSetChecked;
+  let el: NativeControlDemo;
+  let shouldUpdateEl: ShouldUpdateDemo;
 
   beforeEach(async () => {
-    form = await fixture<HTMLFormElement>(html`
-      <form>
-        <value-set
-          name="formControl"
-        ></value-set>
-        <value-set-checked
-          name="formControlChecked"
-        ></value-set-checked>
-      </form>
-    `);
-
-    el = form.querySelector<ValueSet>('value-set')!;
-    elChecked = form.querySelector<ValueSetChecked>('value-set-checked')!;
+    form = await fixture<HTMLFormElement>(html`<form>
+      <native-control-demo name="control"></native-control-demo>
+      <should-update-demo name="should-update"></should-update-demo>
+    </form>`);
+    el = form.querySelector<NativeControlDemo>('native-control-demo')!;
+    shouldUpdateEl = form.querySelector<ShouldUpdateDemo>('should-update-demo')!;
   });
 
   afterEach(fixtureCleanup);
 
-  describe('generic behavior', () => {
-    it('will keep track of the parent form', async () => {
-      expect(el.form).to.equal(form);
-    });
-
-    it('can reset an element value on non-checked controls', async () => {
-      el.value = 'foo';
-      let data = new FormData(form);
-      expect(data.get('formControl')).to.equal('foo');
-      el.resetFormControl();
-      data = new FormData(form);
-      expect(data.get('formControl')).to.equal('');
-    });
-
-    it('can reset an element value on non-checked controls', async () => {
-      elChecked.checked = true;
-      let data = new FormData(form);
-      expect(data.get('formControlChecked')).to.equal('foo');
-      elChecked.resetFormControl();
-      data = new FormData(form);
-      expect(data.get('formControlChecked')).to.be.null;
-    });
-
-    it('will reset the control on form reset', async () => {
-      el.value = 'foo';
-      elChecked.checked = true;
-      let data = new FormData(form);
-      expect(data.get('formControl')).to.equal('foo');
-      expect(data.get('formControlChecked')).to.equal('foo');
-      form.reset();
-      data = new FormData(form);
-      expect(data.get('formControl')).to.equal('');
-      expect(data.get('formControlChecked')).to.be.null;
-    });
-
-    it('will update the value of a checked element if checked', async () => {
-      elChecked.checked = true;
-      let data = new FormData(form);
-      expect(data.get('formControlChecked')).to.equal('foo');
-      elChecked.value = 'bar';
-      data = new FormData(form);
-      expect(data.get('formControlChecked')).to.equal('bar');
-    });
+  it('will keep track of the parent form', async () => {
+    expect(el.form).to.equal(form);
   });
 
-  describe('no checked prperty', () => {
-    it('will intialize without a value', async () => {
-      const data = new FormData(form);
-      expect(data.get('formControlChecked')).to.be.null;
-    });
-
-    it('will set the value on the form when the host value is set', async () => {
-      el.value = 'foo';
-      const data = new FormData(form);
-      expect(data.get('formControl')).to.equal('foo');
-    });
+  it('can reset an element value on non-checked controls', async () => {
+    const spy = sinon.spy(el, 'resetFormControl');
+    el.value = 'foo';
+    let data = new FormData(form);
+    expect(data.get('control')).to.equal('foo');
+    form.reset();
+    data = new FormData(form);
+    expect(spy.called).to.be.true;
+    expect(data.get('control')).to.equal('');
+    spy.restore();
   });
 
-  describe('with a checked property', () => {
-    it('will intialize without a value', async () => {
-      const data = new FormData(form);
-      expect(data.get('formControlChecked')).to.be.null;
-    });
-
-    it('will not participate if checked is false', async () => {
-      elChecked.value = 'foo';
-      const data = new FormData(form);
-      expect(data.get('formControlChecked')).to.be.null;
-    });
-
-    it('will participate if checked is true', async () => {
-      elChecked.value = 'foo';
-      elChecked.checked = true;
-      const data = new FormData(form);
-      expect(data.get('formControlChecked')).to.equal('foo');
-    });
-
-    it('will toggle value as checked is toggled', async () => {
-      elChecked.value = 'foo';
-      elChecked.checked = true;
-      let data = new FormData(form);
-      expect(data.get('formControlChecked')).to.equal('foo');
-      elChecked.checked = false;
-      data = new FormData(form);
-      expect(data.get('formControlChecked')).to.be.null;
-    });
-  });
+  it('will call and evaluate shouldFormaValueUpdate', async () => {
+    const spy = sinon.spy(shouldUpdateEl, 'shouldFormValueUpdate');
+    let data = new FormData(form);
+    shouldUpdateEl.value = 'abc';
+    expect(spy.lastCall.returnValue).to.be.false;
+    expect(data.get('should-update')).to.equal(null);
+    shouldUpdateEl.checked = true;
+    expect(spy.called).to.be.true;
+    expect(spy.lastCall.returnValue).to.be.true;
+    data = new FormData(form);
+    expect(data.get('should-update')).to.equal('abc');
+    spy.restore();
+  })
 });
 
-describe('The FormControlMixin with an initial value', () => {
-  it('will accept the initial value', async () => {
-    const form = await fixture<HTMLFormElement>(html`<form>
-      <default-value name="foo"></default-value>
-    </form>`);
+const FormControl = FormControlMixin(HTMLElement);
+class NativeControlDemo extends FormControl {
+  #value = '';
+  validationTarget = document.createElement('input');
 
-    expect(new FormData(form).get('foo')).to.equal('bar');
-  });
-});
-
-export class NativeFormControl extends FormControlMixin(HTMLElement) {}
-export class DefaultValue extends NativeFormControl {
-  value = 'bar';
-}
-export class ValueSet extends NativeFormControl {
   constructor() {
     super();
+    this.setValue('');
+
     const root = this.attachShadow({ mode: 'open' });
-    const validationTarget = document.createElement('div');
-    validationTarget.tabIndex = 0;
-    root.append(validationTarget);
+    root.append(this.validationTarget);
   }
 
-  get validationTarget(): HTMLDivElement {
-    return this.shadowRoot!.querySelector<HTMLDivElement>('div')!;
+  get value(): string {
+    return this.#value;
+  }
+
+  set value(value: string) {
+    this.setValue(value);
+    this.#value = value;
+  }
+
+  resetFormControl(): void {
+    this.value = '';
   }
 }
-export class ValueSetChecked extends ValueSet {
-  checked = false;
 
-  value = 'foo';
+class ShouldUpdateDemo extends NativeControlDemo {
+  private _checked = false;
+
+  get checked() {
+    return this._checked;
+  }
+
+  set checked(checked: boolean) {
+    this._checked = checked;
+    this.setValue(this.checked ? this.value : '');
+  }
+
+  shouldFormValueUpdate(): boolean {
+    return this.checked;
+  }
 }
 
-window.customElements.define('value-set', ValueSet);
-window.customElements.define('value-set-checked', ValueSetChecked);
-window.customElements.define('default-value', DefaultValue);
+customElements.define('native-control-demo', NativeControlDemo);
+customElements.define('should-update-demo', ShouldUpdateDemo);
