@@ -92,13 +92,13 @@ export const internalInputValidators = (defaultErrorMessages: DefaultErrorMessag
   const validityStates: DefaultErrorMessages = {
     valueMissing: () => 'Please fill out this field.',
     badInput: () => 'Please enter a valid value.',
-    tooShort: (validationTarget: HTMLInputElement) => `Please enter at least ${validationTarget.minLength} characters.`,
-    tooLong: (validationTarget: HTMLInputElement) => `Please enter no more than ${validationTarget.maxLength} characters.`,
-    rangeOverflow: (validationTarget: HTMLInputElement) => `Please enter a value less than ${validationTarget.max}.`,
-    rangeUnderflow: (validationTarget: HTMLInputElement) => `Please enter a value greater than ${validationTarget.min}.`,
-    patternMismatch: (validationTarget: HTMLInputElement) => `Please match the requested format: ${validationTarget.pattern}.`,
-    stepMismatch: (validationTarget: HTMLInputElement) => `Please enter a value that is evenly divisible by ${validationTarget.step}.`,
-    typeMismatch: (validationTarget: HTMLInputElement) => `Please enter a value that corresponds to type: ${validationTarget.type}`,
+    tooShort: ({validationTarget}) => `Please enter at least ${validationTarget.minLength} characters.`,
+    tooLong: ({validationTarget}) => `Please enter no more than ${validationTarget.maxLength} characters.`,
+    rangeOverflow: ({validationTarget}) => `Please enter a value less than ${validationTarget.max}.`,
+    rangeUnderflow: ({validationTarget}) => `Please enter a value greater than ${validationTarget.min}.`,
+    patternMismatch: ({validationTarget}) => `Please match the requested format: ${validationTarget.pattern}.`,
+    stepMismatch: ({validationTarget}) => `Please enter a value that is evenly divisible by ${validationTarget.step}.`,
+    typeMismatch: ({validationTarget}) => `Please enter a value that corresponds to type: ${validationTarget.type}`,
   };
 
   return (Object.entries(validityStates) as [keyof ValidityState, Function][]).map(([validityState, ourErrorMessage]): Validator => ({
@@ -106,10 +106,10 @@ export const internalInputValidators = (defaultErrorMessages: DefaultErrorMessag
     message(instance: HTMLElement & { validationTarget: HTMLInputElement}) {
 
       const theirErrorMessage = defaultErrorMessages[validityState] instanceof Function ?
-        (defaultErrorMessages[validityState] as Function)(instance.validationTarget) :
+        (defaultErrorMessages[validityState] as Function)(instance) :
         defaultErrorMessages[validityState];
 
-      return theirErrorMessage || ourErrorMessage(instance.validationTarget);
+      return theirErrorMessage || ourErrorMessage(instance);
     },
     callback(instance: HTMLElement & { validationTarget: HTMLInputElement}) {
       return instance.validationTarget ? !instance.validationTarget.validity[validityState] : true;

@@ -22,7 +22,7 @@ const testDefaultErrorMessages: DefaultErrorMessages = {
   badInput: 'some badInput message',
   tooLong: 'some tooLong message',
   tooShort: 'some tooShort message',
-  rangeOverflow: (target) => `some rangeOverflow message ${target.name}`,
+  rangeOverflow: (instance) => `some rangeOverflow message ${instance.name}`,
   rangeUnderflow: 'some rangeUnderflow message',
   patternMismatch: 'some pattern message',
   stepMismatch: 'some step message',
@@ -437,7 +437,7 @@ describe('Internal Input Validators with custom default error messages', () => {
 
     el.validationTarget.dispatchEvent( new CustomEvent('change'));
 
-    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.valueMissing as any), el.validationTarget));
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.valueMissing as any), el));
   });
 
   it('returns badInput validity', async () => {
@@ -450,7 +450,7 @@ describe('Internal Input Validators with custom default error messages', () => {
 
     await elementUpdated(el);
 
-    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.badInput as any), el.validationTarget));
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.badInput as any), el));
   });
 
   it('returns typeMismatch validity', async () => {
@@ -463,7 +463,7 @@ describe('Internal Input Validators with custom default error messages', () => {
 
     await elementUpdated(el);
 
-    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.typeMismatch as any), el.validationTarget));
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.typeMismatch as any), el));
   });
 
   it('returns tooShort validity', async () => {
@@ -477,7 +477,7 @@ describe('Internal Input Validators with custom default error messages', () => {
 
     await elementUpdated(el);
 
-    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.tooShort as any), el.validationTarget));
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.tooShort as any), el));
   });
 
   it('returns tooLong validity', async () => {
@@ -495,7 +495,7 @@ describe('Internal Input Validators with custom default error messages', () => {
 
     await elementUpdated(el);
 
-    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.tooLong as any), el.validationTarget));
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.tooLong as any), el));
   });
 
   it('returns rangeOverflow validity', async () => {
@@ -509,7 +509,7 @@ describe('Internal Input Validators with custom default error messages', () => {
 
     await elementUpdated(el);
 
-    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.rangeOverflow as any), el.validationTarget));
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.rangeOverflow as any), el));
   });
 
   it('returns rangeUnderflow validity', async () => {
@@ -523,7 +523,7 @@ describe('Internal Input Validators with custom default error messages', () => {
 
     await elementUpdated(el);
 
-    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.rangeUnderflow as any), el.validationTarget));
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.rangeUnderflow as any), el));
   });
 
   it('returns stepMismatch validity', async () => {
@@ -537,7 +537,7 @@ describe('Internal Input Validators with custom default error messages', () => {
 
     await elementUpdated(el);
 
-    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.stepMismatch as any), el.validationTarget));
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.stepMismatch as any), el));
   });
 
   it('returns patternMismatch validity', async () => {
@@ -549,7 +549,7 @@ describe('Internal Input Validators with custom default error messages', () => {
 
     await elementUpdated(el);
 
-    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.patternMismatch as any), el.validationTarget));
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.patternMismatch as any), el));
   });
 
 });
