@@ -12,15 +12,25 @@ import {
   programmaticValidator,
   requiredValidator,
   internalInputValidators,
-  Validator
+  Validator,
+  DefaultErrorMessages
 } from '../src';
 
-const logValidity = (validity: ValidityState) => {
-  for(const key in validity) {
-    // @ts-ignore
-    console.log(`${key}: `, validity[key]);
-  }
-}
+const getValidator = (validatorKey: string) => internalInputValidators().filter((validator) => validator.key === validatorKey)[0];
+const testDefaultErrorMessages: DefaultErrorMessages = {
+  valueMissing: 'some fake error message',
+  badInput: 'some badInput message',
+  tooLong: 'some tooLong message',
+  tooShort: 'some tooShort message',
+  rangeOverflow: (target) => `some rangeOverflow message ${target.name}`,
+  rangeUnderflow: 'some rangeUnderflow message',
+  patternMismatch: 'some pattern message',
+  stepMismatch: 'some step message',
+  typeMismatch: 'some type message',
+};
+
+const validatorMessage = (message: string | ((instance: HTMLInputElement) => string), target: HTMLInputElement) => message instanceof Function ? message(target) : message;
+
 
 describe('Validators', () => {
   let form: HTMLFormElement;
@@ -51,7 +61,7 @@ describe('Validators', () => {
       el.toggleAttribute('required', true);
       expect(el.validity.valid).to.be.false;
       expect(el.validity.valueMissing).to.be.true;
-      expect(el.internals.validationMessage).to.equal('Please fill out this field');
+      expect(el.internals.validationMessage).to.equal('Please fill out this field.');
     });
 
     it('will respond to value setting', async () => {
@@ -181,7 +191,7 @@ describe('Validators', () => {
       el.value = 'def';
       expect(el.validity.valid).to.be.false;
       expect(el.validity.patternMismatch).to.be.true;
-      expect(el.internals.validationMessage).to.equal('Please match the requested format');
+      expect(el.internals.validationMessage).to.equal('Please match the requested format.');
     });
 
     it('will validate the control if the pattern is set and does match', async () => {
@@ -191,7 +201,7 @@ describe('Validators', () => {
       el.value = 'def';
       expect(el.validity.valid).to.be.false;
       expect(el.validity.patternMismatch).to.be.true;
-      expect(el.internals.validationMessage).to.equal('Please match the requested format');
+      expect(el.internals.validationMessage).to.equal('Please match the requested format.');
       el.value = 'abc';
       expect(el.validity.valid).to.be.true;
       expect(el.validity.patternMismatch).to.be.false;
@@ -249,11 +259,9 @@ describe('Validators', () => {
   });
 });
 
-describe.only('Internal Input Validator function', () => {
+describe('Internal Input Validators', () => {
   let form: HTMLFormElement;
   let el: ValidatedNativeFormControl;
-
-  const getValidator = (validatorKey: string) => internalInputValidators().filter((validator) => validator.key === validatorKey)[0];
 
   beforeEach(async () => {
     form = await fixture<HTMLFormElement>(html`
@@ -275,9 +283,7 @@ describe.only('Internal Input Validator function', () => {
 
     el.validationTarget.dispatchEvent( new CustomEvent('change'));
 
-    expect(el.validity.valueMissing).to.equal(true);
     expect(el.validationMessage).to.equal((getValidator('valueMissing').message as Function)(el.validationTarget));
-    expect(el.validity.valid).to.equal(false);
   });
 
   it('returns badInput validity', async () => {
@@ -290,7 +296,6 @@ describe.only('Internal Input Validator function', () => {
 
     await elementUpdated(el);
 
-    expect(el.validity.badInput).to.equal(true);
     expect(el.validationMessage).to.equal((getValidator('badInput').message as Function)(el));
     expect(el.validity.valid).to.equal(false);
   });
@@ -410,6 +415,145 @@ describe.only('Internal Input Validator function', () => {
 
 });
 
+describe('Internal Input Validators with custom default error messages', () => {
+  let form: HTMLFormElement;
+  let el: ValidatedNativeFormControl;
+
+  beforeEach(async () => {
+    form = await fixture<HTMLFormElement>(html`
+      <form>
+        <validated-native-el2></validated-native-el2>
+      </form>
+    `);
+    await elementUpdated(form);
+    el = form.querySelector<ValidatedNativeFormControl>('validated-native-el2')!;
+  });
+
+  afterEach(fixtureCleanup);
+
+  it('returns valueMissing validity and message', async () => {
+    el.required = true;
+    await elementUpdated(el);
+
+    el.validationTarget.dispatchEvent( new CustomEvent('change'));
+
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.valueMissing as any), el.validationTarget));
+  });
+
+  it('returns badInput validity', async () => {
+    el.type = 'number';
+
+    // +,-, and e are all 'numeric' characters that arent numbers
+    el.validationTarget.focus();
+    await sendKeys({ type: '+'});
+    await sendKeys({ press: 'Tab'});
+
+    await elementUpdated(el);
+
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.badInput as any), el.validationTarget));
+  });
+
+  it('returns typeMismatch validity', async () => {
+    el.type = 'email';
+
+    // +,-, and e are all 'numeric' characters that arent numbers
+    el.validationTarget.focus();
+    await sendKeys({ type: 'a'});
+    await sendKeys({ press: 'Tab'});
+
+    await elementUpdated(el);
+
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.typeMismatch as any), el.validationTarget));
+  });
+
+  it('returns tooShort validity', async () => {
+    el.minLength = '5';
+    await elementUpdated(el);
+
+    // send a value that is less characters than the minLength
+    el.validationTarget.focus();
+    await sendKeys({ type: 'abc'});
+    await sendKeys({ press: 'Tab'});
+
+    await elementUpdated(el);
+
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.tooShort as any), el.validationTarget));
+  });
+
+  it('returns tooLong validity', async () => {
+    el.maxLength = '3';
+    el.value = 'abcdef';
+    await elementUpdated(el);
+
+    // maxlength is tricky because the browser wont let you type more than the maxlength
+    // BUT, validity isnt updated until typing into an input
+    // so you can set the value to a way long value, then send Backspace to delete one character
+    // the resulting value is still too long and validity is updated.
+    el.validationTarget.focus();
+    await sendKeys({ press: 'Backspace'});
+    await sendKeys({ press: 'Tab'});
+
+    await elementUpdated(el);
+
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.tooLong as any), el.validationTarget));
+  });
+
+  it('returns rangeOverflow validity', async () => {
+    el.type = 'number';
+    el.max = '10';
+
+    // send a value that is more than the max
+    el.validationTarget.focus();
+    await sendKeys({ type: '12'});
+    await sendKeys({ press: 'Tab'});
+
+    await elementUpdated(el);
+
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.rangeOverflow as any), el.validationTarget));
+  });
+
+  it('returns rangeUnderflow validity', async () => {
+    el.type = 'number';
+    el.min = '10';
+
+    // send a value that is less than the min
+    el.validationTarget.focus();
+    await sendKeys({ type: '5'});
+    await sendKeys({ press: 'Tab'});
+
+    await elementUpdated(el);
+
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.rangeUnderflow as any), el.validationTarget));
+  });
+
+  it('returns stepMismatch validity', async () => {
+    el.type = 'number';
+    el.step = '10';
+
+    // send a value that isn't evenly divisible by el.step
+    el.validationTarget.focus();
+    await sendKeys({ type: '5'});
+    await sendKeys({ press: 'Tab'});
+
+    await elementUpdated(el);
+
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.stepMismatch as any), el.validationTarget));
+  });
+
+  it('returns patternMismatch validity', async () => {
+    el.pattern = '[A-Z]+'; // only and at least 1 capital letter
+
+    el.validationTarget.focus();
+    await sendKeys({ type: 'a'});
+    await sendKeys({ press: 'Tab'});
+
+    await elementUpdated(el);
+
+    expect(el.validationMessage).to.equal(validatorMessage((testDefaultErrorMessages.patternMismatch as any), el.validationTarget));
+  });
+
+});
+
 export class NativeFormControl extends FormControlMixin(HTMLElement) {}
 export class ValidatedEl extends NativeFormControl {
   static get formControlValidators(): Validator[] {
@@ -510,6 +654,52 @@ class ValidatedNativeFormControl extends FormControlMixin(LitElement) {
     ];
   }
 
+  @property() value!: string;
+  @property() type: string = 'text';
+  @property() required!: boolean;
+  @property() min!: string;
+  @property() max!: string;
+  @property() maxLength!: string;
+  @property() minLength!: string;
+  @property() pattern!: string;
+  @property() step!: string;
+
+  @query('input') validationTarget!: HTMLInputElement;
+
+  // to trigger validation
+  #handleInput(event: Event) {
+    this.value = (event.target as HTMLInputElement).value;
+  }
+
+  render() {
+    return html`
+      <input
+        type="${this.type}"
+        ?required="${this.required}"
+        .value="${live(this.value)}"
+        min="${ifDefined(this.min)}"
+        max="${ifDefined(this.max)}"
+        minlength="${ifDefined(this.minLength)}"
+        maxlength="${ifDefined(this.maxLength)}"
+        step="${ifDefined(this.step)}"
+        pattern="${ifDefined(this.pattern)}"
+        @input="${this.#handleInput}"
+        @change="${this.#handleInput}"
+      />
+    `
+  }
+}
+
+
+@customElement('validated-native-el2')
+class ValidatedNativeFormControl2 extends FormControlMixin(LitElement) {
+  static get formControlValidators(): Validator[] {
+    return [
+      ...internalInputValidators(testDefaultErrorMessages)
+    ];
+  }
+
+  @property() name: string = 'test';
   @property() value!: string;
   @property() type: string = 'text';
   @property() required!: boolean;

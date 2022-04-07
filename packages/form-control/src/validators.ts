@@ -1,5 +1,5 @@
 import { Validator } from './index';
-import { FormControlInterface, FormValue } from './types';
+import { FormControlInterface, FormValue, DefaultErrorMessages } from './types';
 
 export const requiredValidator: Validator = {
   attribute: 'required',
@@ -87,8 +87,6 @@ export const patternValidator: Validator = {
     return !!regExp.exec(value);
   }
 };
-
-type DefaultErrorMessages = Partial<Record<keyof ValidityState, string | ((instance: HTMLInputElement) => string)>>;
 
 export const internalInputValidators = (defaultErrorMessages: DefaultErrorMessages = {}): Validator[] => {
   const validityStates: DefaultErrorMessages = {

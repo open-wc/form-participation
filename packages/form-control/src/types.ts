@@ -86,3 +86,5 @@ export interface IControlHost {
   checked?: boolean;
   disabled?: boolean;
 }
+
+export type DefaultErrorMessages = Partial<Record<keyof ValidityState, string | ((instance: HTMLInputElement) => string)>>;
