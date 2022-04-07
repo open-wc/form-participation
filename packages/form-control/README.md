@@ -88,6 +88,8 @@ Any component that uses the `FormControlMixin` will have a `value` property that
 
 The `FormControlMixin` includes an API for constraint validations and a set of common validators for validity states like `required`, `minlength`, `maxlength` and `pattern`.
 
+For flexibility, the mixin only executes validators listed in the `formControlValidators` static property array. This enables all types of implementations, including those where there isn't necessarily a native input internal to the custom element that extends `FormControlMixin`.
+
 ```typescript
 import { LitElement, html } from 'lit';
 import { customElement, query, property } from 'lit/decorators.js'
@@ -130,7 +132,104 @@ Including the `requiredValidator` adds a validation function attached to the `va
 
 Every `FormControlMixin` element will need a public `validationTarget` which must be a focusable DOM element in the custom element's `shadowRoot`. In the event a control becomes invalid, this item will be focused on form submit for accessibility purposes. Failure to do so will cause an error to throw.
 
-### Validators
+### Internal input
+When you first wire up the `FormControlMixin` in a component with a native input in your shadowRoot template serving as the `validationTarget`, it might seem odd that the validity of that native input **is not** automatically passed up to the validity of your component. This is because the validity of the host element is computed ONLY from the result of the validators listed in `static formControlValidators`. So, for example, if you don't include a validator that checks the internal native input for a certain validity key and passes that up to the host element, it won't get passed. Therefore, you will need to write a validator that checks **EVERY** validity key on the internal input and forwards that validity state to the host element.
+
+In the validator demo above, **ONLY** the `valueMissing` validity key will be set according to the validator's callback. All the other validity keys will remain `true` even if the native input has a different validity.
+
+#### Internal input validity pass through validators
+If your implementation uses an internal native input, you probably want the host element's validity to be reflective of that native input's validity. To simplify including all the right validators, `@open/form-control` ships with a generator function that will specify all the right validators for you in a one-liner you can add to your `formControlValidators` list in whatever order you want.
+
+> NOTE: When using the `internalInputValidators` generator function, having a `validationTarget` is **required**, and that `validationTarget` must be set to an element of type `HTMLInputElement` so that the validity can be properly passed up to the host element.
+
+```typescript
+import { LitElement, html } from 'lit';
+import { customElement, query, property } from 'lit/decorators.js'
+import { live } from 'lit/directives/live.js';
+
+import { FormControlMixin, internalInputValidators } from '@open-wc/form-control';
+
+@customElement('demo-form-control')
+class DemoFormControl extends FormControlMixin(LitElement) {
+  static formControlValidators = [
+    ...internalInputValidators()
+  ];
+
+  @query('input') validationTarget;
+
+  @property({ type: Boolean, reflect: true })
+  required = false;
+
+  @property({ type: String })
+  value = '';
+
+  render() {
+    return html`
+      <label for="input"><slot></slot></label>
+      <input
+        id="input"
+        .value="${live(this.value)}"
+        @input="${this.#onInput}"
+      >
+    `;
+  }
+
+  #onInput({ target }: { target: HTMLInputElement }): void {
+    this.value = target.value;
+  }
+}
+```
+
+The `internalInputValidators` function returns an array of validators, one per validity key, that each forward the validity of that key from the `validationTarget` internal input.
+
+#### Default error messages
+The `internalInputValidators` also has some default error messages that get used in the `message()` callback in each validator in the returned array. If you want to override those messages, you can pass an optional object of messages (or message functions) and those will be used instead of the defaults. If the value of any key
+
+```typescript
+import { LitElement, html } from 'lit';
+import { customElement, query, property } from 'lit/decorators.js'
+import { live } from 'lit/directives/live.js';
+
+import { FormControlMixin, internalInputValidators } from '@open-wc/form-control';
+
+const newDefaultErrorMessages: { [key in keyof ValidityState]: string} = {
+  valueMissing: () => 'Please fill out this field.',
+  tooShort: (validationTarget: HTMLInputElement) => `Please enter at least ${validationTarget.minLength} characters. You're currently using ${validationTarget.value.length} characters)`,
+}
+
+@customElement('demo-form-control')
+class DemoFormControl extends FormControlMixin(LitElement) {
+  static formControlValidators = [
+    ...internalInputValidators(newDefaultErrorMessages)
+  ];
+
+  @query('input') validationTarget;
+
+  @property({ type: Boolean, reflect: true })
+  required = false;
+
+  @property({ type: String })
+  value = '';
+
+  render() {
+    return html`
+      <label for="input"><slot></slot></label>
+      <input
+        id="input"
+        .value="${live(this.value)}"
+        @input="${this.#onInput}"
+      >
+    `;
+  }
+
+  #onInput({ target }: { target: HTMLInputElement }): void {
+    this.value = target.value;
+  }
+}
+```
+
+
+### Included Validators
 
 This package contains a few standardized validators, though more could be added for various unconsidered use cases. So far, there are validators for:
 

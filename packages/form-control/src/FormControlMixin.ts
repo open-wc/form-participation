@@ -445,7 +445,7 @@ export function FormControlMixin<
          */
         validity[key] = !valid;
 
-        if (valid === false) {
+        if (valid === false && validationMessage === '') {
           isValid = false;
           let messageResult = '';
 

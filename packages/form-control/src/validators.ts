@@ -4,7 +4,7 @@ import { FormControlInterface, FormValue } from './types';
 export const requiredValidator: Validator = {
   attribute: 'required',
   key: 'valueMissing',
-  message: 'Please fill out this field',
+  message: 'Please fill out this field.',
   callback(instance: HTMLElement & { required: boolean }, value: FormValue): boolean {
     let valid = true;
 
@@ -76,7 +76,7 @@ export const maxLengthValidator: Validator = {
 export const patternValidator: Validator = {
   attribute: 'pattern',
   key: 'patternMismatch',
-  message: 'Please match the requested format',
+  message: 'Please match the requested format.',
   callback(instance: HTMLElement & { pattern: string }, value: string): boolean {
     /** If no value is provided, this validator should return true */
     if (!value || !instance.pattern) {
@@ -86,4 +86,35 @@ export const patternValidator: Validator = {
     const regExp = new RegExp(instance.pattern);
     return !!regExp.exec(value);
   }
+};
+
+type DefaultErrorMessages = Partial<Record<keyof ValidityState, string | ((instance: HTMLInputElement) => string)>>;
+
+export const internalInputValidators = (defaultErrorMessages: DefaultErrorMessages = {}): Validator[] => {
+  const validityStates: DefaultErrorMessages = {
+    valueMissing: () => 'Please fill out this field.',
+    badInput: () => 'Please enter a valid value.',
+    tooShort: (validationTarget: HTMLInputElement) => `Please enter at least ${validationTarget.minLength} characters.`,
+    tooLong: (validationTarget: HTMLInputElement) => `Please enter no more than ${validationTarget.maxLength} characters.`,
+    rangeOverflow: (validationTarget: HTMLInputElement) => `Please enter a value less than ${validationTarget.max}.`,
+    rangeUnderflow: (validationTarget: HTMLInputElement) => `Please enter a value greater than ${validationTarget.min}.`,
+    patternMismatch: (validationTarget: HTMLInputElement) => `Please match the requested format: ${validationTarget.pattern}.`,
+    stepMismatch: (validationTarget: HTMLInputElement) => `Please enter a value that is evenly divisible by ${validationTarget.step}.`,
+    typeMismatch: (validationTarget: HTMLInputElement) => `Please enter a value that corresponds to type: ${validationTarget.type}`,
+  };
+
+  return (Object.entries(validityStates) as [keyof ValidityState, Function][]).map(([validityState, ourErrorMessage]): Validator => ({
+    key: validityState,
+    message(instance: HTMLElement & { validationTarget: HTMLInputElement}) {
+
+      const theirErrorMessage = defaultErrorMessages[validityState] instanceof Function ?
+        (defaultErrorMessages[validityState] as Function)(instance.validationTarget) :
+        defaultErrorMessages[validityState];
+
+      return theirErrorMessage || ourErrorMessage(instance.validationTarget);
+    },
+    callback(instance: HTMLElement & { validationTarget: HTMLInputElement}) {
+      return instance.validationTarget ? !instance.validationTarget.validity[validityState] : true;
+    }
+  }));
 };
