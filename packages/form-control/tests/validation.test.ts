@@ -1,4 +1,5 @@
 import { expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
+import sinon from 'sinon';
 import { FormControlMixin, FormValue } from '../src';
 import { Validator } from '../src/types';
 
@@ -6,7 +7,7 @@ let callCount = 0;
 const noopValidator: Validator = {
   key: 'customError',
   message: 'No op',
-  callback(instance: HTMLElement, value: FormValue) {
+  isValid(instance: HTMLElement, value: FormValue) {
     callCount += 1;
     return value === 'valid';
   }
@@ -20,6 +21,7 @@ const noopValidatorWithAttribute: Validator = {
 describe('The FormControlMixin using HTMLElement', () => {
   let form: HTMLFormElement;
   let noopEl: NoopValidatorEl | NoopValidatorAttr;
+  let isValidSpy = sinon.spy(noopValidator, 'isValid');
 
   describe('validator with no attributes', () => {
     beforeEach(async () => {
@@ -37,6 +39,7 @@ describe('The FormControlMixin using HTMLElement', () => {
     afterEach(fixtureCleanup);
     afterEach(() => {
       callCount = 0;
+      isValidSpy.restore();
     });
 
     it('has access to the validators array', async () => {
@@ -45,7 +48,16 @@ describe('The FormControlMixin using HTMLElement', () => {
 
     it('will default to invalid', async () => {
       expect(noopEl.validity.valid).to.be.false;
-      expect(callCount).to.equal(1);
+      expect(isValidSpy.called).to.be.true;
+      expect(isValidSpy.callCount).to.equal(1);
+    });
+
+    it('call the validationMessageCallback on invalid', async () => {
+      const validationMessageCallbackSpy = sinon.spy(noopEl, 'validationMessageCallback');
+      expect(noopEl.validity.valid).to.be.false;
+      noopEl.dispatchEvent(new Event('invalid'));
+      expect(validationMessageCallbackSpy.called).to.be.true;
+      validationMessageCallbackSpy.restore();
     });
 
     it('will call the callback after every entry', async () => {
@@ -124,6 +136,22 @@ describe('The FormControlMixin using HTMLElement', () => {
       expect(callCount).to.equal(2);
     });
   });
+
+  // describe('validators in a group', () => {
+  //   it('will validate as a group', async () => {
+  //     const form = await fixture<HTMLFormElement>(html`<form>
+  //       <no-op-validator-attr-group name="one"></no-op-validator-attr-group>
+  //       <no-op-validator-attr-group name="two"></no-op-validator-attr-group>
+  //     </form>`);
+
+  //     let [el1, el2] = form.querySelectorAll<NoopValidatorAttrGroup>('no-op-validator-attr-group');
+  //     el1.value = 'foo';
+  //     el2.value = 'bar';
+
+  //     expect(el1.validity.valid).to.be.false;
+  //     expect(el2.validity.valid).to.be.false;
+  //   });
+  // });
 });
 
 export class NativeFormControl extends FormControlMixin(HTMLElement) {}
@@ -133,6 +161,7 @@ export class NoopValidatorEl extends NativeFormControl {
   }
 
   _value: string|null = '';
+  message = '';
 
   constructor() {
     super();
@@ -157,6 +186,10 @@ export class NoopValidatorEl extends NativeFormControl {
   set value(_value) {
     this._value = _value;
     this.setValue(_value);
+  }
+
+  validationMessageCallback(message: string): void {
+    return;
   }
 }
 

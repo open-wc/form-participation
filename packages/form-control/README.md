@@ -341,6 +341,12 @@ class DemoFormControl extends FormControlMixin(LitElement) {
     `;
   }
 
+  updated(changedProperties: Map<string, unknown>): void {
+    if (changedProperties.has('value')) {
+      this.setValue(this.value);
+    }
+  }
+
   #onInput({ target }: { target: HTMLInputElement }): void {
     this.value = target.value;
   }
@@ -371,7 +377,7 @@ export interface Validator {
   attribute?: string;
   key?: string;
   message: string | ((instance: any, value: any) => string);
-  callback(instance: HTMLElement, value: any): boolean;
+  isValid(instance: HTMLElement, value: any): boolean;
 }
 ```
 
@@ -380,7 +386,7 @@ export interface Validator {
 | attribute | `string`                                            | true     | If defined, adds the specified attribute to the element's `observedAttributes` and the validator will run when the provided attribute changed                                                                                                                                                  |
 | key       | `string`                                            | -        | String name of one of the fields in the `ValidityState` object to override on validator change. If `key` is not set, it is assumed to be `customError`.                                                                                                                                        |
 | message   | `string \| ((instance: any, value: any) => string)` | true     | When set to a string, the `message` will equal the string passed in. If set to a function, the validation message will be the returned value from the callback. The message callback takes two arguments, the element instance and the control's form value (not the element's value property) |
-| callback  | `(instance: any, value: any) => boolean`            | true     | When `callback` returns `true`, the validator is considered to be in a valid state. When the callback returns `false` the validator is considered to be in an invalid state.                                                                                                                   |
+| isValid  | `(instance: any, value: any) => boolean`            | true     | When `isValid` returns `true`, the validator is considered to be in a valid state. When the `isValid` callback returns `false` the validator is considered to be in an invalid state.                                                                                                                   |
 
 #### Example custom validator
 
@@ -392,7 +398,7 @@ export const programaticValidator: Validator = {
   message(instance: HTMLElement & { error: string }): string {
     return instance.error;
   },
-  callback(instance: HTMLElement & { error: string }): boolean {
+  isValid(instance: HTMLElement & { error: string }): boolean {
     return !instance.error;
   }
 };
@@ -418,7 +424,7 @@ class FcRadio extends FormControlMixin(LitElement) {
       attribute: 'required',
       key: 'valueMissing',
       message: 'Please select an item', 
-      callback(instance, value) {
+      isValid(instance, value) {
         const rootNode = instance.getRootNode();
         const selector = `${instance.localName}[name="${instance.getAttribute('name')}"]`;
         const group = Array.from(rootNode.querySelectorAll(selector));

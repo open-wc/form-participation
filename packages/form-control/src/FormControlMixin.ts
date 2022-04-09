@@ -293,19 +293,19 @@ export function FormControlMixin<
       const validity: CustomValidityState = {};
 
       let validationMessage = '';
-      let isValid = true;
+      let controlIsValid = true;
 
       proto.validators.forEach((validator) => {
         /** A validator should only be evaluated if that key isn't currently in an invalid state */
         if (validity[validator.key || 'customError'] !== true) {
           /** Get data oof the Validator */
-          const { message, callback } = validator;
+          const { message, isValid } = validator;
 
           /** If a key is not set, use `customError` as a catch-all */
           const key = validator.key || 'customError';
 
-          /** Invoke the Validator callback with the instance and the value */
-          const valid = callback(this, value);
+          /** Invoke the Validator isValid callback with the instance and the value */
+          const valid = isValid(this, value);
 
           /**
            * Invert the validity because we are setting the new property
@@ -314,7 +314,7 @@ export function FormControlMixin<
           validity[key] = !valid;
 
           if (valid === false && validationMessage === '') {
-            isValid = false;
+            controlIsValid = false;
             let messageResult = '';
 
              /**
@@ -349,7 +349,7 @@ export function FormControlMixin<
        * If the validityTarget does not exist even after the setTimeout,
        * this will throw.
        */
-      if (isValid) {
+      if (controlIsValid) {
         this.internals.setValidity({});
 
         /** If the element is part of a formControlValidationGroup, reset those values */
