@@ -175,6 +175,8 @@ export class CustomControl extends FormControlMixin(HTMLElement) {
 
 The `validationTarget` is required when using the validation API should be an element inside the custom element's shadow root that is capable of receiving focus. Per the DOM spec (and accessibility best practices) the first validation target in source order will receive focus whenever a form is submitted or the element's `requestValidity` method is called.
 
+In the event a control becomes invalid, this item will be focused on form submit for accessibility purposes. Failure to do so will cause an error to throw.
+
 This can be a getter or a property:
 
 ```typescript
