@@ -5,7 +5,7 @@ export const requiredValidator: Validator = {
   attribute: 'required',
   key: 'valueMissing',
   message: 'Please fill out this field',
-  callback(instance: HTMLElement & { required: boolean }, value: FormValue): boolean {
+  isValid(instance: HTMLElement & { required: boolean }, value: FormValue): boolean {
     let valid = true;
 
     if ((instance.hasAttribute('required') || instance.required) && !value) {
@@ -21,7 +21,7 @@ export const programmaticValidator: Validator = {
   message(instance: HTMLElement & { error: string }): string {
     return instance.error;
   },
-  callback(instance: HTMLElement & { error: string }): boolean {
+  isValid(instance: HTMLElement & { error: string }): boolean {
     return !instance.error;
   }
 };
@@ -33,7 +33,7 @@ export const minLengthValidator: Validator = {
     const _value = value as string || '';
     return `Please use at least ${instance.minLength} characters (you are currently using ${_value.length} characters).`;
   },
-  callback(instance: HTMLElement & { minLength: number }, value: string): boolean {
+  isValid(instance: HTMLElement & { minLength: number }, value: string): boolean {
     /** If no value is provided, this validator should return true */
     if (!value) {
       return true;
@@ -57,7 +57,7 @@ export const maxLengthValidator: Validator = {
     const _value = value as string || '';
     return `Please use no more than ${instance.maxLength} characters (you are currently using ${_value.length} characters).`;
   },
-  callback(
+  isValid(
     instance: HTMLElement & { maxLength: number },
     value: string
   ): boolean {
@@ -78,7 +78,7 @@ export const patternValidator: Validator = {
   attribute: 'pattern',
   key: 'patternMismatch',
   message: 'Please match the requested format',
-  callback(instance: HTMLElement & { pattern: string }, value: string): boolean {
+  isValid(instance: HTMLElement & { pattern: string }, value: string): boolean {
     /** If no value is provided, this validator should return true */
     if (!value || !instance.pattern) {
       return true;

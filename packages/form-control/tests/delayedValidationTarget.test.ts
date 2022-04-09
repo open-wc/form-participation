@@ -69,7 +69,7 @@ export class DelayedTarget extends NativeFormControl {
       {
         key: 'customError',
         message: 'always invalid',
-        callback(): boolean {
+        isValid(): boolean {
           return false;
         }
       }
@@ -101,7 +101,7 @@ export class NoTarget extends NativeFormControl {
       {
         key: 'customError',
         message: 'always invalid',
-        callback(): boolean {
+        isValid(): boolean {
           return false;
         }
       }

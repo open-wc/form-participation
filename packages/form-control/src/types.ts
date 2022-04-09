@@ -75,7 +75,7 @@ export interface Validator {
    * @param value {FormValue} - The form control value
    * @returns {boolean} - The validity of a given Validator
    */
-  callback(instance: HTMLElement, value: FormValue): boolean;
+  isValid(instance: HTMLElement, value: FormValue): boolean;
 }
 
 /** Generic type to allow usage of HTMLElement lifecycle methods */
