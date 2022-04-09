@@ -16,7 +16,7 @@ export function FormControlMixin<
      * When a Validator's callback returns false, the entire form control will
      * be set to an invalid state.
      */
-     declare static formControlValidators: Validator[];
+    declare static formControlValidators: Validator[];
 
      /**
      * If set to true the control described should be evaluated and validated
@@ -93,7 +93,7 @@ export function FormControlMixin<
      * to true when the element is focused
      * @private
      */
-     #onFocus = (): void => {
+    #onFocus = (): void => {
       this.#touched = true;
       this.#focused = true;
       this.#shouldShowError();
