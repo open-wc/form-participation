@@ -218,6 +218,11 @@ export function FormControlMixin<
     /** DECLARED INSTANCE METHODS AND PROPERTIES*/
 
     /**
+     * Resets a form control to its initial state
+     */
+    declare resetFormControl: () => void;
+
+    /**
      * This method is used to override the controls' validity message
      * for a given Validator key. This has the highest level of priority when
      * setting a validationMessage, so use this method wisely.
@@ -253,7 +258,7 @@ export function FormControlMixin<
      * care how the consuming component implements this (as a field, member
      * or getter/setter)
      */
-     declare validationTarget: HTMLElement | null;
+    declare validationTarget: HTMLElement | null;
 
     /** PRIVATE LIFECYCLE METHODS */
 
@@ -395,11 +400,6 @@ export function FormControlMixin<
       this.#shouldShowError();
       this?.resetFormControl();
     }
-
-    /**
-     * Resets a form control to its initial state
-     */
-    declare resetFormControl: () => void;
   }
 
   return FormControl as Constructor<FormControlInterface> & TBase;
