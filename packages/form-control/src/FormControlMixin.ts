@@ -202,6 +202,11 @@ export function FormControlMixin<
       const valueToUpdate = valueShouldUpdate ? value : null;
       this.internals.setFormValue(valueToUpdate as string);
       this.#validate(valueToUpdate);
+      if (this.validationMessageCallback) {
+        this.validationMessageCallback(
+          this.#shouldShowError() ? this.validationMessage : ''
+        );
+      }
     }
 
     /**
@@ -275,9 +280,13 @@ export function FormControlMixin<
 
       const showError = this.#forceError || (this.#touched && !this.validity.valid && !this.#focused);
 
-      if (showError) {
+      /**
+       * At the time of writing Firefox doesn't support states
+       * TODO: Remove when check for states when fully support is in place
+       */
+      if (showError && this.internals.states) {
         this.internals.states.add('--show-error');
-      } else {
+      } else if (this.internals.states) {
         this.internals.states.delete('--show-error');
       }
 
@@ -399,6 +408,10 @@ export function FormControlMixin<
       this.#forceError = false;
       this.#shouldShowError();
       this?.resetFormControl();
+
+      this.validationMessageCallback?.(
+        this.#shouldShowError() ? this.validationMessage : ''
+      );
     }
   }
 
