@@ -105,6 +105,9 @@ export function FormControlMixin<
      */
     #onBlur = (): void => {
       this.#focused = false;
+
+      this.#validate(this.shouldFormValueUpdate() ? this.#value : '');
+
       /**
        * Set forceError to ensure error messages persist until
        * the value is changed.
