@@ -6,7 +6,7 @@
     "experimentalDecorators": true,
     "sourceMap": true,
     "downlevelIteration": true,
-    "strict": true,
+    "strict": false,
     "moduleResolution": "node",
     "typeRoots": ["@types", "./types-global", "./types"],
     "types": ["mocha", "chai"],

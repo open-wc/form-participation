@@ -26,10 +26,16 @@ sheet.replace(`
     top: 1px;
     left: 1px;
 }
-:host(:not([checked]):hover), :host(:not([checked]):focus) {
+:host(:not(:--checked):hover), :host(:not(:--checked):focus) {
   background: #cccccc;
 }
-:host(:not([checked]):active) {
+:host(:not([state--checked]):hover), :host(:not([state--checked]):focus) {
+  background: #cccccc;
+}
+:host(:not(:--checked):active) {
+  background: #bbbbbb;
+}
+:host(:not([state--checked]):active) {
   background: #bbbbbb;
 }
 :host(:hover)::after, :host(:focus)::after {
@@ -38,22 +44,34 @@ sheet.replace(`
 :host(:active)::after {
   background: #eeeeee;
 }
-:host([checked]) {
+:host(:--checked) {
   background: ForestGreen;
 }
-:host([checked]:hover) {
+:host([state--checked]) {
+  background: ForestGreen;
+}
+:host(:--checked:hover) {
   background: Green;
 }
-:host([checked]:focus) {
+:host([state--checked]:hover) {
   background: Green;
 }
-:host([checked]:active) {
+:host(:--checked:focus) {
+  background: Green;
+}
+:host([state--checked]:focus) {
+  background: Green;
+}
+:host(:--checked:active) {
   background: DarkGreen;
 }
-:host(:hover) {
-
+:host([state--checked]:active) {
+  background: DarkGreen;
 }
-:host([checked])::after {
+:host(:--checked)::after {
+  left: calc(100% - 24px);
+}
+:host([state--checked])::after {
   left: calc(100% - 24px);
 }
 @media (prefers-reduced-motion: reduce) {

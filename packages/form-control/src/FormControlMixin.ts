@@ -114,7 +114,7 @@ export function FormControlMixin<
       }
       const showError = this.#shouldShowError();
       if (this.validationMessageCallback) {
-        this.validationMessageCallback(showError ? this.validationMessage : '');
+        this.validationMessageCallback(showError ? this.internals.validationMessage : '');
       }
     };
 
@@ -125,7 +125,7 @@ export function FormControlMixin<
     #onInvalid = (): void => {
       this.#forceError = true;
       this.#shouldShowError();
-      this?.validationMessageCallback?.(this.showError ? this.validationMessage : '');
+      this?.validationMessageCallback?.(this.showError ? this.internals.validationMessage : '');
     };
 
     /** Return a reference to the control's form */
@@ -197,16 +197,14 @@ export function FormControlMixin<
      * @param value {FormValue} - The value to pass to the form
      */
     setValue(value: FormValue): void {
+      this.#forceError = false;
+      this.validationMessageCallback?.('');
       this.#value = value;
       const valueShouldUpdate = this.shouldFormValueUpdate();
       const valueToUpdate = valueShouldUpdate ? value : null;
       this.internals.setFormValue(valueToUpdate as string);
       this.#validate(valueToUpdate);
-      if (this.validationMessageCallback) {
-        this.validationMessageCallback(
-          this.#shouldShowError() ? this.validationMessage : ''
-        );
-      }
+      this.#shouldShowError();
     }
 
     /**
@@ -273,7 +271,7 @@ export function FormControlMixin<
      * if necessary.
      * @private
      */
-     #shouldShowError(): boolean {
+    #shouldShowError(): boolean {
       if (this.hasAttribute('disabled')) {
         return false;
       }
@@ -407,7 +405,7 @@ export function FormControlMixin<
       this.#touched = false;
       this.#forceError = false;
       this.#shouldShowError();
-      this?.resetFormControl();
+      this.resetFormControl?.();
 
       this.validationMessageCallback?.(
         this.#shouldShowError() ? this.validationMessage : ''
