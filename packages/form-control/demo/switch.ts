@@ -7,15 +7,14 @@ import styles from './switch.style';
 export class DemoSwitch extends FormControlMixin(LitElement) {
   static styles: CSSStyleSheet = styles;
 
-  @property({ type: Boolean, reflect: true })
+  @property({ type: Boolean, reflect: false })
   checked = false;
 
   @property({ type: String })
   value: string = '';
 
   protected firstUpdated(_changedProperties: Map<string | number | symbol, unknown>): void {
-    super.firstUpdated(_changedProperties);
-
+    this.checked = this.hasAttribute('checked');
     this.addEventListener('click', this.#onClick);
     this.addEventListener('keypress', this.#onKeypress);
     this.setAttribute('role', 'switch');
@@ -37,4 +36,21 @@ export class DemoSwitch extends FormControlMixin(LitElement) {
       this.#onClick();
     }
   };
+
+  shouldFormValueUpdate(): boolean {
+    return this.checked === true;
+  }
+
+  resetFormControl(): void {
+    this.checked = this.hasAttribute('checked');
+  }
+
+  protected updated(changed: Map<string, unknown>): void {
+    if (changed.has('value') || changed.has('checked')) {
+      this.setValue(this.value);
+    }
+    if (changed.has('checked')) {
+      this.internals.states[this.checked ? 'add' : 'delete']('--checked');
+    }
+  }
 }

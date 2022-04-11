@@ -10,22 +10,19 @@
   <body>
     <form id="form">
       <h1>FormControlMixin demo</h1>
-      <lit-control name="lit-control" required></lit-control>
 
-      <legacy-demo name="legacy-demo" minlength="4" pattern=".*lit$">
-        Example of how to implement a legacy control
-      </legacy-demo>
-
-      <vanilla-demo name="vanilla-demo" maxlength="5">Vanilla JS demo</vanilla-demo>
+      <complex-demo
+        name="complex-demo"
+        minlength="5"
+        pattern=".*lit$"
+      >
+        Example of how to implement a complex control
+      </complex-demo>
 
       <div class="form-field">
         <label for="switch">Switch</label>
-        <demo-switch id="switch" name="switch" value="switch-on"> </demo-switch>
+        <demo-switch id="switch" name="switch" value="switch-on" checked> </demo-switch>
       </div>
-
-      <lit-control name="lit-control"></lit-control>
-
-      <new-thing name="new" value="checked"></new-thing>
 
       <div class="buttons">
         <button type="reset">Reset</button>
@@ -33,7 +30,7 @@
       </div>
     </form>
 
-    <script defer src="/demo/page.ts"></script>
+    <script defer src="/demo/page.ts" type="module"></script>
     <script defer src="/demo/index.ts" type="module"></script>
   </body>
 </html>
