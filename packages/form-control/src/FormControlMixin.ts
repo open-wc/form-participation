@@ -387,12 +387,10 @@ export function FormControlMixin<
          */
         let tick = 0;
         const id = setInterval(() => {
-          if (tick >= 100) {
-            clearInterval(id);
-          } else if (this.validity.valid) {
+          if (tick >= 100 || this.validity.valid) {
             clearInterval(id);
           } else if (this.validationTarget) {
-            this.internals.setValidity(this.validity, this.validationMessage, this.validationTarget);
+            this.internals.setValidity(this.validity, validationMessage, this.validationTarget);
             clearInterval(id);
           }
           tick += 1;
