@@ -106,11 +106,11 @@ abstract class ComplexFormControl extends FormControlMixin(LitElement) {
 }
 
 @customElement('complex-demo')
-class ComplexDemo extends ComplexFormControl {
+export class ComplexDemo extends ComplexFormControl {
   static styles = commonSheet;
 
   @query('input')
-  validationTarget: HTMLInputElement;
+  validationTarget!: HTMLInputElement;
 
   render() {
     return html`<label for="control"><slot></slot></label>
