@@ -352,7 +352,7 @@ export function FormControlMixin<
 
       validators.forEach(validator => {
         const key = validator.key || 'customError';
-        const isAsyncValidator = validator.isValid.length === 3;
+        const isAsyncValidator = validator.isValid instanceof Promise;
 
         if (isAsyncValidator) {
           const isValid = (validator as AsyncValidator)
