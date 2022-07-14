@@ -402,21 +402,58 @@ export function FormControlMixin<
      * If the validationTarget is not set, the user can decide how they would
      * prefer to handle focus when the field is validated.
      */
-    #setValidityWithOptionalTarget(validity: Partial<ValidityState>, validationMessage: string|undefined) {
+    #setValidityWithOptionalTarget(validity: Partial<ValidityState>, validationMessage: string|undefined): void {
       if (this.validationTarget) {
         this.internals.setValidity(validity, validationMessage, this.validationTarget);
       } else {
         this.internals.setValidity(validity, validationMessage);
+
+        if (this.internals.validity.valid) {
+          return;
+        }
+        /**
+         * It could be that a give component hasn't rendered by the time it is first
+         * validated. If it hasn't been, wait a bit and add the validationTarget
+         * to the setValidity call.
+         *
+         * TODO: Document the edge case that an element doesn't have a validationTarget
+         * and must be focusable some other way
+         *
+         * TODO: THIS WILL HAPPEN ON VALID HERE TOO
+         */
+         let tick = 0;
+         const id = setInterval(() => {
+           if (tick >= 100 || this.validity.valid) {
+             clearInterval(id);
+           } else if (this.validationTarget) {
+             this.internals.setValidity(this.validity, validationMessage, this.validationTarget);
+             clearInterval(id);
+           }
+           tick += 1;
+         }, 0);
       }
     }
 
     /** Process the validator message attribute */
     #getValidatorMessageForValue(validator: Validator, value: FormValue): string {
+      let result: string;
+
+      /** If the validity callback exists and returns, use that as the result */
+      if (this.validityCallback) {
+        const message = this.validityCallback(validator.key || 'customError');
+
+        if (message) {
+          return message;
+        }
+      }
+
       if (validator.message instanceof Function) {
         return (validator.message as validationMessageCallback)(this, value);
       } else {
         return validator.message as string;
       }
+
+      return result;
     }
 
      /** Reset control state when the form is reset */
