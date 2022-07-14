@@ -4,6 +4,7 @@
   "exclude": [
     "dist",
     "types",
-    "demo"
+    "demo",
+    "tests"
   ]
 }
