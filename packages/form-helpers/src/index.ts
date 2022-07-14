@@ -33,6 +33,8 @@ export const formValues = (form: HTMLFormElement): Record<string, FormValue> => 
   const formData = new FormData(form);
   const values: Record<string, FormValue> = {};
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore This does exist in all browsers. TypeScript is wrong
   for (const [key, value] of formData.entries()) {
     if (!values.hasOwnProperty(key)) {
       values[key] = value;
