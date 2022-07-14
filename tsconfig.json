@@ -4,6 +4,7 @@
     "declaration": true,
     "declarationMap": true,
     "experimentalDecorators": true,
+    "lib": ["DOM", "ES2020"],
     "sourceMap": true,
     "downlevelIteration": true,
     "strict": true,

@@ -4,16 +4,20 @@ import { AsyncValidator, FormControlMixin, FormValue, requiredValidator } from '
 
 const sleepValidator: AsyncValidator = {
   message: 'Hello world',
-  isValid(instance: AsyncValidatorDemo, value: FormValue, signal: AbortSignal): Promise<boolean> {
+  isValid(instance: AsyncValidatorDemo, value: FormValue, signal: AbortSignal): Promise<boolean|void> {
+    let id: ReturnType<typeof setTimeout>;
+
     return new Promise(resolve => {
-      setTimeout(() => {
-        if (signal.aborted) {
-          console.log(`abort for value ${value}`);
-          return;
-        }
+      signal.addEventListener('abort', () => {
+        clearTimeout(id);
+        console.log(`abort for value ${value}`);
+        resolve();
+      });
+
+      id = setTimeout(() => {
         resolve(value === 'foo');
       }, 5000);
-    })
+    });
   }
 }
 

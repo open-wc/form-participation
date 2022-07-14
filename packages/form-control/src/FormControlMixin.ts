@@ -352,12 +352,10 @@ export function FormControlMixin<
 
       validators.forEach(validator => {
         const key = validator.key || 'customError';
-        const isAsyncValidator = validator.isValid instanceof Promise;
+        const isValid = validator.isValid(this, value, abortController.signal);
+        const isAsyncValidator = isValid instanceof Promise;
 
         if (isAsyncValidator) {
-          const isValid = (validator as AsyncValidator)
-            .isValid(this, value, abortController.signal);
-
           asyncValidators.push(isValid);
 
           isValid.then(isValidatorValid => {
@@ -371,16 +369,14 @@ export function FormControlMixin<
               this.#setValidityWithOptionalTarget(validity, validationMessage);
             });
         } else {
-          const isValidatorValid = (validator as SyncValidator).isValid(this, value);
-
           /** Invert the validity state to correspond to the ValidityState API */
-          validity[key] = !isValidatorValid;
+          validity[key] = !isValid;
 
-          if (this.validity[key] !== !isValidatorValid) {
+          if (this.validity[key] !== !isValid) {
             hasChange = true;
           }
 
-          if (!isValidatorValid) {
+          if (!isValid) {
             validationMessage = this.#getValidatorMessageForValue(validator, value);
           }
         }
