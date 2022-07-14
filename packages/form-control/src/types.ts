@@ -24,7 +24,7 @@ export interface FormControlInterface {
   formResetCallback(): void;
   resetFormControl?(): void;
   // validateAsync(validator: AsyncValidator): Promise<void>;
-  valueChangedCallback?(value: FormValue): void;
+  valueChangedCallback?(value: FormValue): void | Promise<void>;
   validityCallback(validationKey: string): string | void;
   validationMessageCallback(message: string): void;
   setValue(value: FormValue): void;

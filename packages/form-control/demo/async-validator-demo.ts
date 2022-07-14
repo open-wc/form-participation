@@ -52,10 +52,9 @@ export class AsyncValidatorDemo extends FormControlMixin(LitElement) {
     }
   }
 
-  valueChangedCallback(value: FormValue): void {
+  async valueChangedCallback(value: FormValue): Promise<void> {
     console.log({value}, this.validationComplete)
-    this.validationComplete.then(() => {
-      console.log('validations complete', value);
-    })
+    await this.validationComplete;
+    console.log('validations complete', value);
   }
 }
