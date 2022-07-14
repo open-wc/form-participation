@@ -18,7 +18,7 @@ export interface FormControlInterface {
   readonly showError: boolean;
   readonly validationMessage: string;
   readonly validity: ValidityState;
-  readonly validationComplete: boolean;
+  readonly validationComplete: Promise<void>;
   connectedCallback(): void;
   checkValidity(): boolean;
   formResetCallback(): void;
