@@ -8,6 +8,7 @@ form!.addEventListener('submit', (event: Event) => {
   const data = new FormData(event.target as HTMLFormElement);
   console.log({
     switch: data.get('switch'),
-    complex: data.get('complex-demo')
+    complex: data.get('complex-demo'),
+    async: data.get('async')
   });
 });

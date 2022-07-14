@@ -19,6 +19,7 @@
   ],
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
+    "build:watch": "tsc --project tsconfig.build.json --watch",
     "start": "web-dev-server --node-resolve --watch",
     "test": "web-test-runner tests/*.test.ts --node-resolve --coverage",
     "test:playwright": "web-test-runner tests/*.test.ts --node-resolve --playwright --browsers chromium firefox webkit"

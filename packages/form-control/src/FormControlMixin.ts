@@ -1,4 +1,4 @@
-import { Constructor, CustomValidityState, FormControlInterface, FormValue, IControlHost, Validator } from './types';
+import { AsyncValidator, Constructor, CustomValidityState, FormControlInterface, FormValue, IControlHost, SyncValidator, validationMessageCallback, Validator } from './types';
 
 export function FormControlMixin<
   TBase extends Constructor<HTMLElement & IControlHost> & { observedAttributes?: string [] }
@@ -106,7 +106,7 @@ export function FormControlMixin<
     #onBlur = (): void => {
       this.#focused = false;
 
-      this.#validate(this.shouldFormValueUpdate() ? this.#value : '');
+      this.#runValidators(this.shouldFormValueUpdate() ? this.#value : '');
 
       /**
        * Set forceError to ensure error messages persist until
@@ -206,7 +206,10 @@ export function FormControlMixin<
       const valueShouldUpdate = this.shouldFormValueUpdate();
       const valueToUpdate = valueShouldUpdate ? value : null;
       this.internals.setFormValue(valueToUpdate as string);
-      this.#validate(valueToUpdate);
+      if (this.valueChangedCallback) {
+        this.valueChangedCallback(valueToUpdate);
+      }
+      this.#runValidators(valueToUpdate);
       this.#shouldShowError();
     }
 
@@ -218,6 +221,10 @@ export function FormControlMixin<
      * `true`.
      */
     shouldFormValueUpdate(): boolean {
+      return true;
+    }
+
+    get validationComplete() {
       return true;
     }
 
@@ -294,110 +301,80 @@ export function FormControlMixin<
       return showError;
     }
 
-     /**
-     * Call all the Validators on the control
-     * @private
-     */
-    #validate(value: FormValue): void {
+    #runValidators(value: FormValue): void {
       const proto = this.constructor as typeof FormControl;
       const validity: CustomValidityState = {};
+      const validators = proto.validators;
 
-      let validationMessage = '';
-      let controlIsValid = true;
+      const abortController = new AbortController();
+      let validationMessage: string | undefined = undefined;
+      /** Track to see if any validity key has changed */
+      let hasChange = false;
 
-      proto.validators.forEach((validator) => {
-        /** A validator should only be evaluated if that key isn't currently in an invalid state */
-        if (validity[validator.key || 'customError'] !== true) {
-          /** Get data oof the Validator */
-          const { message, isValid } = validator;
+      if (!validators.length) {
+        return;
+      }
 
-          /** If a key is not set, use `customError` as a catch-all */
-          const key = validator.key || 'customError';
+      validators.forEach(validator => {
+        const key = validator.key || 'customError';
+        const isAsyncValidator = validator.isValid.length === 3;
 
-          /** Invoke the Validator isValid callback with the instance and the value */
-          const valid = isValid(this, value);
+        if (isAsyncValidator) {
+          (validator as AsyncValidator)
+            .isValid(this, value, abortController.signal).then(isValidatorValid => {
+              if (isValidatorValid === undefined || isValidatorValid === null) {
+                return;
+              }
+              /** Invert the validity state to correspond to the ValidityState API */
+              validity[key] = !isValidatorValid;
 
-          /**
-           * Invert the validity because we are setting the new property
-           * on the new ValidityState object
-           */
-          validity[key] = !valid;
+              validationMessage = this.#getValidatorMessageForValue(validator, value);
+              this.#setValidityWithOptionalTarget(validity, validationMessage);
+            });
+        } else {
+          const isValidatorValid = (validator as SyncValidator).isValid(this, value);
 
-          if (valid === false && validationMessage === '') {
-            controlIsValid = false;
-            let messageResult = '';
+          /** Invert the validity state to correspond to the ValidityState API */
+          validity[key] = !isValidatorValid;
 
-             /**
-             * The Validator interfaces allows for the message property
-             * to be either a string or a function. If it is a function,
-             * we want to get the returned value to use when calling
-             * ElementInternals.prototype.setValidity.
-             *
-             * If the Validator.message is a string, use it directly. However,
-             * if a control has a ValidityCallback, it can override the error
-             * message for a given validity key.
-             */
-            if (this.validityCallback && this.validityCallback(key)) {
-              messageResult = this.validityCallback(key) as string;
-            } else if (message instanceof Function) {
-              messageResult = message(this, value);
-            } else if (typeof message === 'string') {
-              messageResult = message;
-            }
+          if (this.validity[key] !== !isValidatorValid) {
+            hasChange = true;
+          }
 
-            validationMessage = messageResult;
+          if (!isValidatorValid) {
+            validationMessage = this.#getValidatorMessageForValue(validator, value);
           }
         }
       });
 
       /**
-       * In some cases, the validationTarget might not be rendered
-       * at this point, if the validationTarget does exist, proceed
-       * with a call to internals.setValidity. If the validationTarget
-       * is still not set, we essentially wait a tick until it is there.
-       *
-       * If the validityTarget does not exist even after the setTimeout,
-       * this will throw.
+       * Only run updates when a sync validator has a change. This is to prevent
+       * situations where running sync validators can override async validators
+       * that are still in progress
        */
-      if (controlIsValid) {
-        this.internals.setValidity({});
+      if (hasChange) {
+        this.#setValidityWithOptionalTarget(validity, validationMessage);
+      }
+    }
 
-        /** If the element is part of a formControlValidationGroup, reset those values */
-        if (proto.formControlValidationGroup === true) {
-          this.#formValidationGroup.forEach(control => {
-            /** Don't duplicate effort */
-            if (control !== this) {
-              control.internals.setValidity({});
-            }
-          });
-        }
-      } else if (this.validationTarget) {
+    /**
+     * If the validationTarget is not set, the user can decide how they would
+     * prefer to handle focus when the field is validated.
+     */
+    #setValidityWithOptionalTarget(validity: Partial<ValidityState>, validationMessage: string|undefined) {
+      if (this.validationTarget) {
         this.internals.setValidity(validity, validationMessage, this.validationTarget);
       } else {
-        /**
-         * If the validationTarget is not set, the user can decide how they would
-         * prefer to handle focus when the field is validated.
-         */
         this.internals.setValidity(validity, validationMessage);
+      }
+    }
 
-        /**
-         * It could be that a give component hasn't rendered by the time it is first
-         * validated. If it hasn't been, wait a bit and add the validationTarget
-         * to the setValidity call.
-         *
-         * TODO: Document the edge case that an element doesn't have a validationTarget
-         * and must be focusable some other way
-         */
-        let tick = 0;
-        const id = setInterval(() => {
-          if (tick >= 100 || this.validity.valid) {
-            clearInterval(id);
-          } else if (this.validationTarget) {
-            this.internals.setValidity(this.validity, validationMessage, this.validationTarget);
-            clearInterval(id);
-          }
-          tick += 1;
-        }, 0);
+    /** Process the validator message attribute */
+    #getValidatorMessageForValue(validator: Validator, value: FormValue): string {
+      if (validator.message instanceof Function) {
+        return (validator.message as validationMessageCallback)(this, value);
+      } else {
+        return validator.message as string;
       }
     }
 
