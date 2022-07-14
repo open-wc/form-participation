@@ -75,6 +75,9 @@ export function FormControlMixin<
      */
     #touched = false;
 
+    /** An internal abort controller for cancelling pending async validation */
+    #abortController?: AbortController;
+
     /** All of the controls within a root with a matching local name and form name */
     get #formValidationGroup(): NodeListOf<FormControl> {
       const rootNode = this.getRootNode() as HTMLElement;
@@ -224,8 +227,17 @@ export function FormControlMixin<
       return true;
     }
 
-    get validationComplete() {
-      return true;
+    /** Save a reference to the validation complete resolver */
+    #validationCompleteResolver?: (value: void | PromiseLike<void>) => void;
+
+    /** When true validation will be pending */
+    #isValidationPending = false;
+
+    #validationComplete = Promise.resolve();
+
+    /** A promise that will resolve when all pending validations are complete */
+    get validationComplete(): Promise<void> {
+      return new Promise(resolve => resolve(this.#validationComplete));
     }
 
     /** DECLARED INSTANCE METHODS AND PROPERTIES*/
@@ -305,9 +317,32 @@ export function FormControlMixin<
       const proto = this.constructor as typeof FormControl;
       const validity: CustomValidityState = {};
       const validators = proto.validators;
+      const asyncValidators: Promise<boolean|void>[] = [];
 
+      if (!this.#isValidationPending) {
+        this.#validationComplete = new Promise(resolve => {
+          this.#validationCompleteResolver = resolve
+        });
+        this.#isValidationPending = true;
+      }
+
+      /**
+       * If an abort controller exists from a previous validation step
+       * notify still-running async validators that we are requesting they
+       * discontinue any work.
+       */
+      if (this.#abortController) {
+        this.#abortController.abort();
+      }
+
+      /**
+       * Create a new abort controller and replace the instance reference
+       * so we can clean it up for next time
+       */
       const abortController = new AbortController();
+      this.#abortController = abortController;
       let validationMessage: string | undefined = undefined;
+
       /** Track to see if any validity key has changed */
       let hasChange = false;
 
@@ -320,8 +355,12 @@ export function FormControlMixin<
         const isAsyncValidator = validator.isValid.length === 3;
 
         if (isAsyncValidator) {
-          (validator as AsyncValidator)
-            .isValid(this, value, abortController.signal).then(isValidatorValid => {
+          const isValid = (validator as AsyncValidator)
+            .isValid(this, value, abortController.signal);
+
+          asyncValidators.push(isValid);
+
+          isValid.then(isValidatorValid => {
               if (isValidatorValid === undefined || isValidatorValid === null) {
                 return;
               }
@@ -346,6 +385,12 @@ export function FormControlMixin<
           }
         }
       });
+
+      Promise.allSettled(asyncValidators)
+        .then(() => {
+          this.#isValidationPending = false;
+          this.#validationCompleteResolver?.();
+        });
 
       /**
        * Only run updates when a sync validator has a change. This is to prevent

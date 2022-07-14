@@ -12,7 +12,7 @@ const sleepValidator: AsyncValidator = {
           return;
         }
         resolve(value === 'foo');
-      }, 2000);
+      }, 5000);
     })
   }
 }
@@ -48,8 +48,10 @@ export class AsyncValidatorDemo extends FormControlMixin(LitElement) {
     }
   }
 
-  // valueChangedCallback(value: FormValue): void {
-  //   console.log('valuechanged', value)
-  //   this.validateAsync(sleepValidator);
-  // }
+  valueChangedCallback(value: FormValue): void {
+    console.log({value}, this.validationComplete)
+    this.validationComplete.then(() => {
+      console.log('validations complete', value);
+    })
+  }
 }
