@@ -9,7 +9,7 @@ const sleepValidator: AsyncValidator = {
       return Promise<void>.resolve();
     }
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const id = setTimeout(() => {
         resolve(value === 'foo');
       }, 2000);
@@ -55,7 +55,6 @@ export class AsyncValidatorDemo extends FormControlMixin(LitElement) {
   }
 
   async valueChangedCallback(value: FormValue): Promise<void> {
-    console.log({value}, this.validationComplete)
     await this.validationComplete;
     console.log('validations complete', value);
   }
