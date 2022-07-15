@@ -77,6 +77,7 @@ export function FormControlMixin<
 
     /** An internal abort controller for cancelling pending async validation */
     #abortController?: AbortController;
+    #previousAbortController?: AbortController;
 
     /** All of the controls within a root with a matching local name and form name */
     get #formValidationGroup(): NodeListOf<FormControl> {
@@ -209,10 +210,10 @@ export function FormControlMixin<
       const valueShouldUpdate = this.shouldFormValueUpdate();
       const valueToUpdate = valueShouldUpdate ? value : null;
       this.internals.setFormValue(valueToUpdate as string);
+      this.#runValidators(valueToUpdate);
       if (this.valueChangedCallback) {
         this.valueChangedCallback(valueToUpdate);
       }
-      this.#runValidators(valueToUpdate);
       this.#shouldShowError();
     }
 
@@ -320,6 +321,7 @@ export function FormControlMixin<
       const asyncValidators: Promise<boolean|void>[] = [];
 
       if (!this.#isValidationPending) {
+        console.log('not')
         this.#validationComplete = new Promise(resolve => {
           this.#validationCompleteResolver = resolve
         });
@@ -333,6 +335,7 @@ export function FormControlMixin<
        */
       if (this.#abortController) {
         this.#abortController.abort();
+        this.#previousAbortController = this.#abortController;
       }
 
       /**
@@ -382,10 +385,14 @@ export function FormControlMixin<
         }
       });
 
+      /** Once all the async validators have settled, resolve validationComplete */
       Promise.allSettled(asyncValidators)
         .then(() => {
-          this.#isValidationPending = false;
-          this.#validationCompleteResolver?.();
+          /** Don't resolve validations if the signal is aborted */
+          if (!abortController?.signal.aborted) {
+            this.#isValidationPending = false;
+            this.#validationCompleteResolver?.();
+          }
         });
 
       /**
