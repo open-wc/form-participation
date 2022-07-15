@@ -24,8 +24,8 @@ describe('The FormControlMixin using HTMLElement', () => {
     el = form.querySelector<AsyncValidatorEl>('async-validator-el')!;
   });
 
-  afterEach(fixtureCleanup);
   afterEach(() => {
+    fixtureCleanup();
     abortCount = 0;
   });
 
@@ -35,13 +35,13 @@ describe('The FormControlMixin using HTMLElement', () => {
     expect(el.validity.valid).to.be.false;
   });
 
-  it('will alert the user to a change in the validator state using validationComplete', async () => {
+  it('validationComplete will resolve when validators are complete', async () => {
     expect(el.validity.valid).to.be.true;
     await el.validationComplete;
     expect(el.validity.valid).to.be.false;
   });
 
-  it('will validate after success criteria is met', async () => {
+  it('will become valid after success criteria is met', async () => {
     expect(el.validity.valid).to.be.true;
     await el.validationComplete;
     expect(el.validity.valid).to.be.false;
