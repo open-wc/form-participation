@@ -1,4 +1,4 @@
-import { AsyncValidator, Constructor, CustomValidityState, FormControlInterface, FormValue, IControlHost, SyncValidator, validationMessageCallback, Validator } from './types';
+import { Constructor, CustomValidityState, FormControlInterface, FormValue, IControlHost, validationMessageCallback, Validator } from './types';
 
 export function FormControlMixin<
   TBase extends Constructor<HTMLElement & IControlHost> & { observedAttributes?: string [] }
@@ -418,8 +418,6 @@ export function FormControlMixin<
          *
          * TODO: Document the edge case that an element doesn't have a validationTarget
          * and must be focusable some other way
-         *
-         * TODO: THIS WILL HAPPEN ON VALID HERE TOO
          */
          let tick = 0;
          const id = setInterval(() => {
@@ -436,8 +434,6 @@ export function FormControlMixin<
 
     /** Process the validator message attribute */
     #getValidatorMessageForValue(validator: Validator, value: FormValue): string {
-      let result: string;
-
       /** If the validity callback exists and returns, use that as the result */
       if (this.validityCallback) {
         const message = this.validityCallback(validator.key || 'customError');
@@ -452,8 +448,6 @@ export function FormControlMixin<
       } else {
         return validator.message as string;
       }
-
-      return result;
     }
 
      /** Reset control state when the form is reset */
