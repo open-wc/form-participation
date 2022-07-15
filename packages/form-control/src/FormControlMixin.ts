@@ -321,7 +321,6 @@ export function FormControlMixin<
       const asyncValidators: Promise<boolean|void>[] = [];
 
       if (!this.#isValidationPending) {
-        console.log('not')
         this.#validationComplete = new Promise(resolve => {
           this.#validationCompleteResolver = resolve
         });
