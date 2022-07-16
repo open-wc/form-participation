@@ -1,5 +1,6 @@
 import { css, LitElement, html, TemplateResult, PropertyValueMap } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
+import { live } from 'lit/directives/live.js';
 import { AsyncValidator, FormControlMixin, FormValue, requiredValidator } from '../src';
 
 const sleepValidator: AsyncValidator = {
@@ -41,7 +42,15 @@ export class AsyncValidatorDemo extends FormControlMixin(LitElement) {
   validationTarget!: HTMLInputElement;
 
   render(): TemplateResult {
-    return html`<input @input="${this._onInput}" ?required="${this.required}">`;
+    return html`<input
+      @input="${this._onInput}"
+      ?required="${this.required}"
+      .value="${live(this.value)}"
+    >`;
+  }
+
+  formResetCallback(): void {
+    this.value = '';
   }
 
   private _onInput(event: KeyboardEvent & { target: HTMLInputElement }): void {

@@ -404,6 +404,43 @@ export const programaticValidator: Validator = {
 };
 ```
 
+Validators come in two varieties: synchronous and asynchronous. The most common pattern for validators are synchronous. This means that the `isValid` method directly returns the validity of the object in real time. Asynchronous validators, on the other hand return a `Promise<boolean|void>` indicating the validity state of the validator where a `Promise<void>` value has no effect on the validity status. 
+
+Because its possible for an asynchronous validator to run multiple times in rapid succession, the `Validator.isValid` method provides a third argument called an [abort signal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). This signal will be aborted during the next validatation run. This allows developers to respond to frequent validation requests and cancel any long-running validatons.
+
+Let's look at an naive example of an async validator:
+
+```typescript
+import { AsyncValidator, FormValue } from '@open-wc/form-control';
+
+const sleepValidator: AsyncValidator = {
+  message: 'Hello world',
+  isValid(instance: AsyncValidatorDemo, value: FormValue, signal: AbortSignal): Promise<boolean|void> {
+    if (signal.aborted) {
+      return Promise<void>.resolve();
+    }
+
+    return new Promise((resolve) => {
+      const id = setTimeout(() => {
+        resolve(value === 'foo');
+      }, 2000);
+
+      signal.addEventListener('abort', () => {
+        clearTimeout(id);
+        console.log(`abort for value ${value}`);
+        resolve();
+      });
+    });
+  }
+}
+```
+
+Here we can see the `isValid` method returns a `Promise` object that evaluates the `value` and returns sets the control to valid if and only if the value is exactly equal to the string `'foo'`. This validator creates some asynchronous behavior by utilizing the `setTimeout` function which will wait at minimum two seconds before finally validating the control.
+
+When the `signal` dispatches an abort event, the validator cancels its the timeout, logs some information to the developer about the validator not running for the current value and resolves. This will only happen when the validation cycle is kicked off again before all validators in the chain finish.
+
+For more information on `AbortController` and `AbortSignal`, see this post from [@samthor](https://twitter.com/samthor) titled [_AbortController is your friend_](https://whistlr.info/2022/abortcontroller-is-your-friend/).
+
 ### Validating a control as a group
 
 It is possible to evaluate the validity of a set of controls as a group (similar to a radio button) where if one control in the group doesn't meet some criteria the validation fails. To enable this behavior, you need to set the components static property `formControlValidationGroup` to `true`. The following example emulates how the native `required` property interacts with `input[type="radio"]`.
