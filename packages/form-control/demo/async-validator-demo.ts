@@ -22,11 +22,31 @@ const sleepValidator: AsyncValidator = {
       });
     });
   }
-}
+};
+
+const onBlurValidator: AsyncValidator = {
+  key: 'badInput',
+  message: 'Length must be a multiple of two',
+  isValid(instance: AsyncValidatorDemo, value: string, signal: AbortSignal): Promise<boolean|void> {
+    if (signal.aborted) {
+      return Promise<void>.resolve();
+    }
+
+    return new Promise(resolve => {
+      instance.validationTarget?.addEventListener('blur', () => {
+        resolve(value!.length % 2 === 0);
+      }, { signal });
+    });
+  }
+};
 
 @customElement('async-validator')
 export class AsyncValidatorDemo extends FormControlMixin(LitElement) {
-  static styles = css`:host(:invalid) input {
+  static styles = css`
+  :host {
+    display: block;
+  }
+  :host(:invalid) input {
     background: tomato;
   }`;
 
