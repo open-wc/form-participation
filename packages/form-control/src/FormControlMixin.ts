@@ -1,4 +1,4 @@
-import { Constructor, CustomValidityState, FormControlInterface, FormValue, IControlHost, validationMessageCallback, Validator } from './types';
+import { Constructor, CustomValidityState, FormControlInterface, FormValue, IControlHost, validationMessageCallback, Validator } from './types.js';
 
 export function FormControlMixin<
   TBase extends Constructor<HTMLElement & IControlHost> & { observedAttributes?: string [] }
