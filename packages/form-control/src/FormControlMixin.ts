@@ -319,6 +319,7 @@ export function FormControlMixin<
       const validity: CustomValidityState = {};
       const validators = proto.validators;
       const asyncValidators: Promise<boolean|void>[] = [];
+      const hasAsyncValidators = validators.some((validator) => validator.isValid instanceof Promise)
 
       if (!this.#isValidationPending) {
         this.#validationComplete = new Promise(resolve => {
@@ -395,11 +396,14 @@ export function FormControlMixin<
         });
 
       /**
+       * If async validators are present:
        * Only run updates when a sync validator has a change. This is to prevent
        * situations where running sync validators can override async validators
        * that are still in progress
+       *
+       * If async validators are not present, always update validity
        */
-      if (hasChange) {
+      if (hasChange || !hasAsyncValidators) {
         this.#setValidityWithOptionalTarget(validity, validationMessage);
       }
     }
