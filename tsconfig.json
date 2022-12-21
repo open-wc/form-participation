@@ -6,6 +6,7 @@
     "experimentalDecorators": true,
     "lib": ["DOM", "ES2020"],
     "sourceMap": true,
+    "inlineSources": true,
     "downlevelIteration": true,
     "strict": true,
     "moduleResolution": "node",
