@@ -4,6 +4,7 @@
   "description": "Helpers for working with forms",
   "main": "index.js",
   "module": "index.js",
+  "type": "module",
   "exports": {
     ".": "./index.js"
   },
