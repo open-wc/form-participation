@@ -405,6 +405,9 @@ export function FormControlMixin<
           if (!abortController?.signal.aborted) {
             this.#isValidationPending = false;
             this.#validationCompleteResolver?.();
+            /** Clear old AbortControllers once validation is complete to avoid unnecessary signals */
+            this.#abortController = undefined;
+            this.#previousAbortController = undefined;
           }
         });
 
