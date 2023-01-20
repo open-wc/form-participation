@@ -1,5 +1,5 @@
 import { expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
-import sinon from 'sinon';
+import sinon, { SinonSpy } from 'sinon';
 import { FormControlMixin, FormValue } from '../src';
 import { Validator } from '../src/types';
 
@@ -10,6 +10,14 @@ const noopValidator: Validator = {
   isValid(instance: HTMLElement, value: FormValue) {
     callCount += 1;
     return value === 'valid';
+  }
+};
+
+const multiAttributeValidator: Validator = {
+  attributes: ['foo', 'bar'],
+  message: 'foo',
+  isValid() {
+    return true;
   }
 };
 
@@ -137,6 +145,32 @@ describe('The FormControlMixin using HTMLElement', () => {
     });
   });
 
+  describe('Multi-attribute validators', () => {
+    let callbackSpy: SinonSpy;
+
+    beforeEach(() => {
+      callbackSpy = sinon.spy(multiAttributeValidator, 'isValid');
+    });
+
+    afterEach(() => {
+      callbackSpy.restore();
+    });
+
+    it('will be evaluated on each attribute change', async () => {
+      const el = new MultiAttributeValidator();
+      /** Called when the element is constructed */
+      expect(callbackSpy.callCount).to.equal(1);
+
+      /** Called when the first attribute changes */
+      el.setAttribute('foo', 'foo');
+      expect(callbackSpy.callCount).to.equal(2);
+
+      /** Called when the first attribute changes */
+      el.setAttribute('bar', 'bar');
+      expect(callbackSpy.callCount).to.equal(3);
+    })
+  });
+
   // describe('validators in a group', () => {
   //   it('will validate as a group', async () => {
   //     const form = await fixture<HTMLFormElement>(html`<form>
@@ -154,6 +188,19 @@ describe('The FormControlMixin using HTMLElement', () => {
   // });
 });
 
+export class MultiAttributeValidator extends FormControlMixin(HTMLElement) {
+  static get formControlValidators() {
+    return [multiAttributeValidator];
+  }
+
+  constructor() {
+    super();
+    const root = this.attachShadow({ mode: 'open' });
+    const btn = document.createElement('button');
+    root.append(btn);
+    this.validationTarget = btn;
+  }
+}
 export class NativeFormControl extends FormControlMixin(HTMLElement) {}
 export class NoopValidatorEl extends NativeFormControl {
   static get formControlValidators() {
@@ -201,3 +248,4 @@ export class NoopValidatorAttr extends NoopValidatorEl {
 
 window.customElements.define('no-op-validator-el', NoopValidatorEl);
 window.customElements.define('no-op-validator-attr', NoopValidatorAttr);
+window.customElements.define('multi-attribute-validator-el', MultiAttributeValidator);

@@ -36,7 +36,7 @@ export function FormControlMixin<
      * is updated.
      */
      static get observedAttributes(): string[] {
-      const validatorAttributes = this.validators.map((validator) => validator.attribute);
+      const validatorAttributes = this.validators.map((validator) => validator.attribute || validator.attributes).flat();
 
       const observedAttributes = super.observedAttributes || [];
 
@@ -51,6 +51,19 @@ export function FormControlMixin<
      */
     static getValidator(attribute: string): Validator | null {
       return this.validators.find((validator) => validator.attribute === attribute) || null;
+    }
+
+    /**
+     * Get all validators that are set to react to a given attribute
+     * @param {string} attribute - The attribute that has changed
+     * @returns {Validator[]}
+     */
+    static getValidators(attribute: string): Validator[] | null {
+      return this.validators.filter(validator => {
+        if (validator.attribute === attribute || validator.attributes?.includes(attribute)) {
+          return true;
+        }
+      });
     }
 
     /** The ElementInternals instance for the control. */
@@ -189,9 +202,9 @@ export function FormControlMixin<
        * control validation.
        */
       const proto = this.constructor as typeof FormControl;
-      const validator = proto.getValidator(name);
+      const validators = proto.getValidators(name);
 
-      if (validator && this.validationTarget) {
+      if (validators?.length && this.validationTarget) {
         this.setValue(this.#value);
       }
     }
