@@ -36,7 +36,7 @@ export function FormControlMixin<
      * is updated.
      */
      static get observedAttributes(): string[] {
-      const validatorAttributes = this.validators.map((validator) => validator.attribute || validator.attributes).flat();
+      const validatorAttributes = this.validators.map((validator) => validator.attribute).flat();
 
       const observedAttributes = super.observedAttributes || [];
 
@@ -60,7 +60,7 @@ export function FormControlMixin<
      */
     static getValidators(attribute: string): Validator[] | null {
       return this.validators.filter(validator => {
-        if (validator.attribute === attribute || validator.attributes?.includes(attribute)) {
+        if (validator.attribute === attribute || validator.attribute?.includes(attribute)) {
           return true;
         }
       });

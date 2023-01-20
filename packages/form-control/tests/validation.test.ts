@@ -14,7 +14,7 @@ const noopValidator: Validator = {
 };
 
 const multiAttributeValidator: Validator = {
-  attributes: ['foo', 'bar'],
+  attribute: ['foo', 'bar'],
   message: 'foo',
   isValid() {
     return true;
