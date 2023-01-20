@@ -1,4 +1,5 @@
 import { expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
+import { SinonSpy, spy } from 'sinon';
 import {
   FormControlMixin,
   maxLengthValidator,

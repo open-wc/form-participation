@@ -46,6 +46,13 @@ export interface ValidatorBase {
    attribute?: string;
 
    /**
+    * If present, the FormControl object will be re-run
+    * when any of these attributes change. Some validators will
+    * need only one attribute. In that case, use the attribute property
+    */
+   attributes?: string[];
+
+   /**
     * This key determines which field on the control's validity
     * object will be toggled when a given Validator is run. This
     * property must exist on the global constraint validation
