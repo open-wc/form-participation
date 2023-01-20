@@ -3089,7 +3089,7 @@ ee-first@1.1.1:
   resolved "https://registry.npmjs.org/ee-first/-/ee-first-1.1.1.tgz"
   integrity sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=
 
-element-internals-polyfill@^1.1.0:
+element-internals-polyfill@^1.1.19:
   version "1.1.19"
   resolved "https://registry.yarnpkg.com/element-internals-polyfill/-/element-internals-polyfill-1.1.19.tgz#4e49a3f76ad97c989d1724b3f2b95499f463140d"
   integrity sha512-deGDqTkxXtYAQl/VSH5xXWfCe4zEVCkWCYrVeNOPtg3F6W1i0JYRjqPU+MZO9mS1P2UxkkD2vPH+Mb6W/CDicA==
