@@ -42,15 +42,11 @@ export interface ValidatorBase {
    * when this attribute changes. Some validators won't need this
    * like a validator that ensures a given value can be cast
    * to a number.
+   *
+   * If an array of attribute names are provided, the attribute will
+   * respond to changes for any of the listed attributes.
    */
-   attribute?: string;
-
-   /**
-    * If present, the FormControl object will be re-run
-    * when any of these attributes change. Some validators will
-    * need only one attribute. In that case, use the attribute property
-    */
-   attributes?: string[];
+   attribute?: string | string[];
 
    /**
     * This key determines which field on the control's validity
