@@ -61,4 +61,13 @@ describe('The submit form helper', () => {
 
     expect(formSubmitStub.callCount).to.equal(0);
   });
+
+  it('will emit an event that bubbles', async () => {
+    const onSubmit = (event: SubmitEvent) => {
+      event.preventDefault();
+      expect(event.bubbles).to.be.true;
+    }
+    form = await fixture<HTMLFormElement>(html`<form @submit="${onSubmit}"></form>`);
+    submit(form);
+  });
 });
