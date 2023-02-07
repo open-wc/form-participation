@@ -34,9 +34,9 @@ const form = document.querySelector('#someForm');
 const input = document.querySelector('input');
 
 input.addEventListener( 'keypress', ($event) => {
-  if($event.keyCode === 13) { // Enter key
+  if($event.code === 'Enter') {
     submit(form); // submit event is emitted, and form's submit() method is called if the `submit` event is not `defaultPrevented`
-    console.log(submitted) // submitted will be false if the input doesn't have a value AND is required
+    console.log(submitted) // submitHandler will not be called if the input doesn't have a value AND is required
   }
 });
 
