@@ -392,7 +392,10 @@ export function FormControlMixin<
             hasChange = true;
           }
 
-          if (!isValid) {
+          // only update the validationMessage for the first invalid scenario
+          // so that earlier invalid validators dont get their messages overwritten by later ones
+          // in the validators array
+          if (!isValid && !validationMessage) {
             validationMessage = this.#getValidatorMessageForValue(validator, value);
           }
         }
