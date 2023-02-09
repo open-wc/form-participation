@@ -28,7 +28,7 @@ export const programmaticValidator: Validator = {
 
 export const minLengthValidator: Validator = {
   attribute: 'minlength',
-  key: 'rangeUnderflow',
+  key: 'tooShort',
   message(instance: FormControlInterface & { minLength: number }, value: FormValue): string {
     const _value = value as string || '';
     return `Please use at least ${instance.minLength} characters (you are currently using ${_value.length} characters).`;
@@ -49,7 +49,7 @@ export const minLengthValidator: Validator = {
 
 export const maxLengthValidator: Validator = {
   attribute: 'maxlength',
-  key: 'rangeOverflow',
+  key: 'tooLong',
   message(
     instance: FormControlInterface & { maxLength: number },
     value: FormValue

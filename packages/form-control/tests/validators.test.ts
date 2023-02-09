@@ -1,5 +1,4 @@
-import { expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
-import { SinonSpy, spy } from 'sinon';
+import { aTimeout, expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
 import {
   FormControlMixin,
   maxLengthValidator,
@@ -7,6 +6,7 @@ import {
   patternValidator,
   programmaticValidator,
   requiredValidator,
+  validationMessageCallback,
   Validator
 } from '../src';
 
@@ -72,16 +72,16 @@ describe('The FormControlMixin using HTMLElement', () => {
   describe('minLengthValidator', () => {
     it('will not affect the element unless minLength is set', async () => {
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeUnderflow).to.be.false;
+      expect(el.validity.tooShort).to.be.false;
     });
 
     it('will invalidate element when value length is less than minLength', async () => {
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeUnderflow).to.be.false;
+      expect(el.validity.tooShort).to.be.false;
       el.minLength = 3;
       el.value = 'ab';
       expect(el.validity.valid).to.be.false;
-      expect(el.validity.rangeUnderflow).to.be.true;
+      expect(el.validity.tooShort).to.be.true;
       expect(el.internals.validationMessage).to.equal(
         'Please use at least 3 characters (you are currently using 2 characters).'
       );
@@ -89,20 +89,20 @@ describe('The FormControlMixin using HTMLElement', () => {
 
     it('will validate element when value length is equal to minLength', async () => {
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeUnderflow).to.be.false;
+      expect(el.validity.tooShort).to.be.false;
       el.minLength = 3;
       el.value = 'abc';
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeUnderflow).to.be.false;
+      expect(el.validity.tooShort).to.be.false;
     });
 
     it('will validate element when value length is greater than minLength', async () => {
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeUnderflow).to.be.false;
+      expect(el.validity.tooShort).to.be.false;
       el.minLength = 3;
       el.value = 'abcd';
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeUnderflow).to.be.false;
+      expect(el.validity.tooShort).to.be.false;
     });
   });
 
@@ -110,16 +110,16 @@ describe('The FormControlMixin using HTMLElement', () => {
   describe('maxLengthValidator', () => {
     it('will not affect the element unless maxLength is set', async () => {
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeOverflow).to.be.false;
+      expect(el.validity.tooLong).to.be.false;
     });
 
     it('will invalidate controls where value is longer than maxLength', async () => {
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeOverflow).to.be.false;
+      expect(el.validity.tooLong).to.be.false;
       el.maxLength = 3;
       el.value = 'abcd';
       expect(el.validity.valid).to.be.false;
-      expect(el.validity.rangeOverflow).to.be.true;
+      expect(el.validity.tooLong).to.be.true;
       expect(el.internals.validationMessage).to.equal(
         'Please use no more than 3 characters (you are currently using 4 characters).'
       );
@@ -127,32 +127,32 @@ describe('The FormControlMixin using HTMLElement', () => {
 
     it('will validate controls where value is equal to maxLength', async () => {
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeOverflow).to.be.false;
+      expect(el.validity.tooLong).to.be.false;
       el.maxLength = 3;
       el.value = 'abcd';
       expect(el.validity.valid).to.be.false;
-      expect(el.validity.rangeOverflow).to.be.true;
+      expect(el.validity.tooLong).to.be.true;
       expect(el.internals.validationMessage).to.equal(
         'Please use no more than 3 characters (you are currently using 4 characters).'
       );
       el.value = 'abc';
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeOverflow).to.be.false;
+      expect(el.validity.tooLong).to.be.false;
     });
 
     it('will validate controls where value is less than maxLength', async () => {
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeOverflow).to.be.false;
+      expect(el.validity.tooLong).to.be.false;
       el.maxLength = 3;
       el.value = 'abcd';
       expect(el.validity.valid).to.be.false;
-      expect(el.validity.rangeOverflow).to.be.true;
+      expect(el.validity.tooLong).to.be.true;
       expect(el.internals.validationMessage).to.equal(
         'Please use no more than 3 characters (you are currently using 4 characters).'
       );
       el.value = 'ab';
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeOverflow).to.be.false;
+      expect(el.validity.tooLong).to.be.false;
     });
   });
 
@@ -190,16 +190,16 @@ describe('The FormControlMixin using HTMLElement', () => {
   describe('maxLengthValidator', () => {
     it('will not affect the element unless maxLength is set', async () => {
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeOverflow).to.be.false;
+      expect(el.validity.tooLong).to.be.false;
     });
 
     it('will invalidate controls where value is longer than maxLength', async () => {
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeOverflow).to.be.false;
+      expect(el.validity.tooLong).to.be.false;
       el.maxLength = 3;
       el.value = 'abcd';
       expect(el.validity.valid).to.be.false;
-      expect(el.validity.rangeOverflow).to.be.true;
+      expect(el.validity.tooLong).to.be.true;
       expect(el.internals.validationMessage).to.equal(
         'Please use no more than 3 characters (you are currently using 4 characters).'
       );
@@ -207,34 +207,55 @@ describe('The FormControlMixin using HTMLElement', () => {
 
     it('will validate controls where value is equal to maxLength', async () => {
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeOverflow).to.be.false;
+      expect(el.validity.tooLong).to.be.false;
       el.maxLength = 3;
       el.value = 'abcd';
       expect(el.validity.valid).to.be.false;
-      expect(el.validity.rangeOverflow).to.be.true;
+      expect(el.validity.tooLong).to.be.true;
       expect(el.internals.validationMessage).to.equal(
         'Please use no more than 3 characters (you are currently using 4 characters).'
       );
       el.value = 'abc';
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeOverflow).to.be.false;
+      expect(el.validity.tooLong).to.be.false;
     });
 
     it('will validate controls where value is less than maxLength', async () => {
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeOverflow).to.be.false;
+      expect(el.validity.tooLong).to.be.false;
       el.maxLength = 3;
       el.value = 'abcd';
       expect(el.validity.valid).to.be.false;
-      expect(el.validity.rangeOverflow).to.be.true;
+      expect(el.validity.tooLong).to.be.true;
       expect(el.internals.validationMessage).to.equal(
         'Please use no more than 3 characters (you are currently using 4 characters).'
       );
       el.value = 'ab';
       expect(el.validity.valid).to.be.true;
-      expect(el.validity.rangeOverflow).to.be.false;
+      expect(el.validity.tooLong).to.be.false;
     });
   });
+
+  /** iterative validation message */
+  it('should have only the first invalid message when multiple validators are invalid', async () => {
+    el.pattern = '^[A-Z]$';
+    el.maxLength = 5;
+    el.value = 'aBCDEF';
+
+    // expect the error message to be the maxLength validato message because it is the first one
+    // in the array that will return invalid
+    expect(el.validationMessage).to.equal((maxLengthValidator.message as validationMessageCallback)(el, el.value));
+    expect(el.validity.tooLong).to.be.true;
+    expect(el.validity.patternMismatch).to.be.true;
+
+
+    // change the value so that the maxLength validator returns valid
+    el.value = 'aBCDE';
+
+    // expect the error message to be the pattern validator message because it now the first one that will be invalid
+    expect(el.validationMessage).to.equal(patternValidator.message);
+  });
+
 });
 
 export class NativeFormControl extends FormControlMixin(HTMLElement) {}
