@@ -70,4 +70,17 @@ describe('The submit form helper', () => {
     form = await fixture<HTMLFormElement>(html`<form @submit="${onSubmit}"></form>`);
     submit(form);
   });
+
+  describe('novalidate', () => {
+    beforeEach(async () => {
+      form = await fixture<HTMLFormElement>(html`<form novalidate @submit="${submitCallback}">
+        <input required>
+      </form>`);
+    });
+
+    it('will respect novalidate attribute', async () => {
+      submit(form);
+      expect(submitted).to.be.true;
+    })
+  })
 });
