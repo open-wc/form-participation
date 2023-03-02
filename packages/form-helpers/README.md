@@ -1,4 +1,4 @@
-# @open-wc/form-utils
+# @open-wc/form-helpers
 
 A collection of form control related utilities for working with forms.
 
@@ -45,6 +45,15 @@ function submitHandler(event) {
   submitted = true;
 };
 ```
+
+Please note that `submit` helper respects form's `novalidate` attribute and doesn't call `reportValidity()` if it presents. So with the example below, submit handler will ignore form validation and trigger the submit event.
+
+```html
+<form id="someForm" @submit="${submitHandler}" novalidate>
+  <input required>
+</form>
+```
+
 
 ### Parse form values
 
