@@ -4,9 +4,11 @@
   "description": "Base class for creating form-participating custom elements",
   "main": "index.js",
   "module": "index.js",
+  "type": "module",
   "exports": {
     ".": "./index.js",
-    "./validators": "./src/validators.js",
+    "./FormControlMixin.js": "./src/FormControlMixin.js",
+    "./validators.js": "./src/validators.js",
     "./types": "./src/types.js"
   },
   "files": [
