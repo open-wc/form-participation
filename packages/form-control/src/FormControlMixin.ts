@@ -92,6 +92,12 @@ export function FormControlMixin<
     #abortController?: AbortController;
     #previousAbortController?: AbortController;
 
+    /**
+     * Used for trackin if a validation target has been set to manage focus
+     * when the control's validity is reported
+     */
+    #awaitingValidationTarget = true;
+
     /** All of the controls within a root with a matching local name and form name */
     get #formValidationGroup(): NodeListOf<FormControl> {
       const rootNode = this.getRootNode() as HTMLElement;
@@ -143,6 +149,14 @@ export function FormControlMixin<
      * @private
      */
     #onInvalid = (): void => {
+      if (this.#awaitingValidationTarget && this.validationTarget) {
+        this.internals.setValidity(
+          this.validity,
+          this.validationMessage,
+          this.validationTarget
+        );
+      }
+      this.#touched = true;
       this.#forceError = true;
       this.#shouldShowError();
       this?.validationMessageCallback?.(this.showError ? this.internals.validationMessage : '');
@@ -375,15 +389,15 @@ export function FormControlMixin<
           asyncValidators.push(isValid);
 
           isValid.then(isValidatorValid => {
-              if (isValidatorValid === undefined || isValidatorValid === null) {
-                return;
-              }
-              /** Invert the validity state to correspond to the ValidityState API */
-              validity[key] = !isValidatorValid;
+            if (isValidatorValid === undefined || isValidatorValid === null) {
+              return;
+            }
+            /** Invert the validity state to correspond to the ValidityState API */
+            validity[key] = !isValidatorValid;
 
-              validationMessage = this.#getValidatorMessageForValue(validator, value);
-              this.#setValidityWithOptionalTarget(validity, validationMessage);
-            });
+            validationMessage = this.#getValidatorMessageForValue(validator, value);
+            this.#setValidityWithOptionalTarget(validity, validationMessage);
+          });
         } else {
           /** Invert the validity state to correspond to the ValidityState API */
           validity[key] = !isValid;
@@ -431,30 +445,23 @@ export function FormControlMixin<
     #setValidityWithOptionalTarget(validity: Partial<ValidityState>, validationMessage: string|undefined): void {
       if (this.validationTarget) {
         this.internals.setValidity(validity, validationMessage, this.validationTarget);
+        this.#awaitingValidationTarget = false;
       } else {
         this.internals.setValidity(validity, validationMessage);
 
         if (this.internals.validity.valid) {
           return;
         }
+
         /**
-         * It could be that a give component hasn't rendered by the time it is first
-         * validated. If it hasn't been, wait a bit and add the validationTarget
-         * to the setValidity call.
-         *
-         * TODO: Document the edge case that an element doesn't have a validationTarget
-         * and must be focusable some other way
+         * Sets mark the component as awaiting a validation target
+         * if the element dispatches an invalid event, the #onInvalid listener
+         * will check to see if the validation target has been set since this call
+         * has run. This useful in cases like Lit's use of the query
+         * decorator for setting the validationTarget or any scenario
+         * where the validationTarget isn't available upon construction
          */
-         let tick = 0;
-         const id = setInterval(() => {
-           if (tick >= 100 || this.validity.valid) {
-             clearInterval(id);
-           } else if (this.validationTarget) {
-             this.internals.setValidity(this.validity, validationMessage, this.validationTarget);
-             clearInterval(id);
-           }
-           tick += 1;
-         }, 0);
+        this.#awaitingValidationTarget = true;
       }
     }
 
