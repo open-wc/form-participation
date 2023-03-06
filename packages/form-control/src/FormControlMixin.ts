@@ -202,9 +202,9 @@ export function FormControlMixin<
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     constructor(...args: any[]) {
       super(...args);
-      this.addEventListener('focus', this.#onFocus);
-      this.addEventListener('blur', this.#onBlur);
-      this.addEventListener('invalid', this.#onInvalid);
+      this.addEventListener?.('focus', this.#onFocus);
+      this.addEventListener?.('blur', this.#onBlur);
+      this.addEventListener?.('invalid', this.#onInvalid);
       this.setValue(null);
     }
 
