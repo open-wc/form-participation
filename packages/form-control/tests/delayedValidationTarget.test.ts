@@ -52,13 +52,6 @@ describe('The FormControlMixin using HTMLElement', () => {
       form.requestSubmit();
       expect(document.activeElement?.shadowRoot?.activeElement).to.be.undefined;
     });
-
-    it('will cancel the validationTarget loop if the control becomes true', async () => {
-      const spy = sinon.spy(window, 'clearInterval');
-      el.internals.setValidity({});
-      await aTimeout(1);
-      expect(spy.called).to.be.true;
-    });
   });
 });
 

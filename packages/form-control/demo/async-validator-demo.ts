@@ -1,4 +1,4 @@
-import { css, LitElement, html, TemplateResult, PropertyValueMap } from 'lit';
+import { css, LitElement, html, TemplateResult, PropertyValues } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { live } from 'lit/directives/live.js';
 import { AsyncValidator, FormControlMixin, FormValue, requiredValidator } from '../src';
@@ -7,12 +7,13 @@ const sleepValidator: AsyncValidator = {
   message: 'Hello world',
   isValid(instance: AsyncValidatorDemo, value: FormValue, signal: AbortSignal): Promise<boolean|void> {
     if (signal.aborted) {
-      return Promise<void>.resolve();
+      return Promise.resolve();
     }
 
     return new Promise((resolve) => {
       const id = setTimeout(() => {
         resolve(value === 'foo');
+        console.log(`Evaluated ${value} for validity update`);
       }, 2000);
 
       signal.addEventListener('abort', () => {
@@ -29,7 +30,7 @@ const onBlurValidator: AsyncValidator = {
   message: 'Length must be a multiple of two',
   isValid(instance: AsyncValidatorDemo, value: string, signal: AbortSignal): Promise<boolean|void> {
     if (signal.aborted) {
-      return Promise<void>.resolve();
+      return Promise.resolve();
     }
 
     return new Promise(resolve => {
@@ -77,7 +78,7 @@ export class AsyncValidatorDemo extends FormControlMixin(LitElement) {
     this.value = event.target.value;
   }
 
-  protected updated(changed: PropertyValueMap<this>): void {
+  protected updated(changed: PropertyValues<this>): void {
     if (changed.has('value')) {
       this.setValue(this.value);
     }
