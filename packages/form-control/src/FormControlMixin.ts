@@ -93,7 +93,7 @@ export function FormControlMixin<
     #previousAbortController?: AbortController;
 
     /**
-     * Used for trackin if a validation target has been set to manage focus
+     * Used for tracking if a validation target has been set to manage focus
      * when the control's validity is reported
      */
     #awaitingValidationTarget = true;
