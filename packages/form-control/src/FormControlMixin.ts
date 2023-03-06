@@ -155,6 +155,7 @@ export function FormControlMixin<
           this.validationMessage,
           this.validationTarget
         );
+        this.#awaitingValidationTarget = false;
       }
       this.#touched = true;
       this.#forceError = true;
