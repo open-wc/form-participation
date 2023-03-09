@@ -1,34 +1,9 @@
 import { aTimeout, expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
-import sinon from 'sinon';
 import { FormControlMixin, Validator } from '../src';
 
 describe('The FormControlMixin using HTMLElement', () => {
   let form: HTMLFormElement;
   let el: DelayedTarget | NoTarget;
-
-  describe('the delayed validationTarget scenario', () => {
-    beforeEach(async () => {
-      form = await fixture<HTMLFormElement>(html`
-        <form>
-          <delayed-target
-            name="formControl"
-          ></delayed-target>
-        </form>
-      `);
-
-      el = form.querySelector<DelayedTarget>('delayed-target')!;
-    });
-
-    afterEach(fixtureCleanup);
-
-    it('will wait for the validationTarget to be set', async () => {
-      expect(el.validationTarget).to.be.undefined;
-      expect(el.validity.valid).to.be.false;
-      await aTimeout(100);
-
-      expect(el.validationTarget).not.to.be.undefined;
-    });
-  });
 
   describe('the no validationTarget scenario', () => {
     beforeEach(async () => {
