@@ -9,7 +9,7 @@ export const submit = (form: HTMLFormElement): void => {
   if (!form.noValidate && !form.reportValidity()) {
     return;
   } else {
-    const submitEvent = new SubmitEvent('submit', {
+    const submitEvent = new Event('submit', {
       bubbles: true,
       cancelable: true
     });
