@@ -63,7 +63,7 @@ describe('The submit form helper', () => {
   });
 
   it('will emit an event that bubbles', async () => {
-    const onSubmit = (event: Event) => {
+    const onSubmit = (event: SubmitEvent) => {
       event.preventDefault();
       expect(event.bubbles).to.be.true;
     }
