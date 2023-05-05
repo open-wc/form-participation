@@ -1,3 +1,12 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+type Constructor<T = Record<string, unknown>> = new (...args: any[]) => T;
+
+/**
+ * Backwards compatibility with jsdom < v21. In jsdom < 21 SubmitEvent is not implemented.
+*/
+const PolyfilledSubmitEvent: Constructor<SubmitEvent> = globalThis.SubmitEvent = typeof globalThis.SubmitEvent !== 'undefined' ? SubmitEvent : Event as unknown as Constructor<SubmitEvent>;
+
+
 /**
  * Implicitly submit a form by first validating all controls. If the form
  * is valid, issue a submit event and if that event is not prevented, manually
@@ -9,7 +18,7 @@ export const submit = (form: HTMLFormElement): void => {
   if (!form.noValidate && !form.reportValidity()) {
     return;
   } else {
-    const submitEvent = new Event('submit', {
+    const submitEvent = new PolyfilledSubmitEvent('submit', {
       bubbles: true,
       cancelable: true
     });
