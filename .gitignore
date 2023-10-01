@@ -29,8 +29,6 @@ lerna-debug.log
 /_site/
 /_site-dev/
 
-## we prefer yarn.lock
-package-lock.json
 ## lock files in packages we do not need to save
 packages/*/yarn.lock
 

@@ -18,29 +18,29 @@ jobs:
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
 
-      - name: Setup Node 19.x
+      - name: Setup Node 20.x
         uses: actions/setup-node@master
         with:
-          node-version: 19.x
+          node-version: 20.x
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install Dependencies
-        run: yarn
+        run: npm ci
 
       - name: Build packages
-        run: npx lerna run build
+        run: npm run build
 
       - name: Lint
-        run: yarn lint:ci
+        run: npm run lint:ci
 
       - name: Test
-        run: yarn test
+        run: npm test
 
       - name: Version
-        run: yarn changeset version
+        run: npm run changeset version
 
       - name: Publish
-        run: yarn changeset publish
+        run: npm run changeset publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
