@@ -46,11 +46,22 @@ export class DemoSwitch extends FormControlMixin(LitElement) {
   }
 
   protected updated(changed: Map<string, unknown>): void {
-    if (changed.has('value') || changed.has('checked')) {
+    const checked: any = 'checked';
+    if (changed.has('value') || changed.has(checked)) {
       this.setValue(this.value);
     }
-    if (changed.has('checked')) {
-      this.internals.states[this.checked ? 'add' : 'delete']('--checked');
+    if (changed.has(checked)) {
+      const states = this.internals.states;
+      if(this.checked) {
+        try {
+          states.add(checked);
+        } catch {
+          states.add(`--${checked}`);
+        }
+      } else {
+        states.delete(checked);
+        states.delete(`--${checked}`);
+      }
     }
   }
 }

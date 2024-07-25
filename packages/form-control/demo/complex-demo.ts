@@ -23,11 +23,11 @@ input {
   font-size: 16px;
   padding: 4px;
 }
-/** Default invalid state */
-:host(:--show-error) input {
+/** Default invalid state with fallback https://developer.mozilla.org/en-US/docs/Web/API/CustomStateSet#using_a_try...catch_block */
+:host(:is(:--show-error, :state(show-error))) input {
   border-color: red;
 }
-:host(:--show-error) span {
+:host(:is(:--show-error, :state(show-error))) span {
   color: red;
 }
 

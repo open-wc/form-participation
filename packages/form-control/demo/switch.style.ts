@@ -26,13 +26,13 @@ sheet.replace(`
     top: 1px;
     left: 1px;
 }
-:host(:not(:--checked):hover), :host(:not(:--checked):focus) {
+:host(:not(:is(:--checked, :state(checked))):hover), :host(:not(:is(:--checked, :state(checked))):focus) {
   background: #cccccc;
 }
 :host(:not([state--checked]):hover), :host(:not([state--checked]):focus) {
   background: #cccccc;
 }
-:host(:not(:--checked):active) {
+:host(:not(:is(:--checked, :state(checked))):active) {
   background: #bbbbbb;
 }
 :host(:not([state--checked]):active) {
@@ -44,31 +44,31 @@ sheet.replace(`
 :host(:active)::after {
   background: #eeeeee;
 }
-:host(:--checked) {
+:host(:is(:--checked, :state(checked))) {
   background: ForestGreen;
 }
 :host([state--checked]) {
   background: ForestGreen;
 }
-:host(:--checked:hover) {
+:host(:is(:--checked, :state(checked)):hover) {
   background: Green;
 }
 :host([state--checked]:hover) {
   background: Green;
 }
-:host(:--checked:focus) {
+:host(:is(:--checked, :state(checked)):focus) {
   background: Green;
 }
 :host([state--checked]:focus) {
   background: Green;
 }
-:host(:--checked:active) {
+:host(:is(:--checked, :state(checked)):active) {
   background: DarkGreen;
 }
 :host([state--checked]:active) {
   background: DarkGreen;
 }
-:host(:--checked)::after {
+:host(:is(:--checked, :state(checked)))::after {
   left: calc(100% - 24px);
 }
 :host([state--checked])::after {

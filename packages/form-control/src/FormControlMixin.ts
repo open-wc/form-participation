@@ -18,7 +18,7 @@ export function FormControlMixin<
      */
     declare static formControlValidators: Validator[];
 
-     /**
+    /**
      * If set to true the control described should be evaluated and validated
      * as part of a group. Like a radio, if any member of the group's validity
      * changes the the other members should update as well.
@@ -35,7 +35,7 @@ export function FormControlMixin<
      * validator will be evaluated whenever the host's required attribute
      * is updated.
      */
-     static get observedAttributes(): string[] {
+    static get observedAttributes(): string[] {
       const validatorAttributes = this.validators.map((validator) => validator.attribute).flat();
 
       const observedAttributes = super.observedAttributes || [];
@@ -286,10 +286,10 @@ export function FormControlMixin<
      */
     declare validityCallback: (validationKey: string) => string | void;
 
-     /**
-      * Called when the control's validationMessage should be changed
-      * @param message { string } - The new validation message
-      */
+    /**
+     * Called when the control's validationMessage should be changed
+     * @param message { string } - The new validation message
+     */
     declare validationMessageCallback: (message: string) => void;
 
     /**
@@ -318,7 +318,7 @@ export function FormControlMixin<
 
     /**
      * Check to see if an error should be shown. This method will also
-     * update the internals state object with the --show-error state
+     * update the internals state object with the show-error state
      * if necessary.
      * @private
      */
@@ -327,16 +327,23 @@ export function FormControlMixin<
         return false;
       }
 
-      const showError = this.#forceError || (this.#touched && !this.validity.valid && !this.#focused);
+      const showError = this.#forceError || (this.#touched && !this.validity.valid && !this.#focused),
+        states = this.internals.states,
+        // Casted to any, because the polyfill forces dashed-ident syntax https://github.com/calebdwilliams/element-internals-polyfill/issues/126
+        // TODO: Remove any cast when the issue is resolved
+        state: any = 'show-error';
 
-      /**
-       * At the time of writing Firefox doesn't support states
-       * TODO: Remove when check for states when fully support is in place
-       */
-      if (showError && this.internals.states) {
-        this.internals.states.add('--show-error');
-      } else if (this.internals.states) {
-        this.internals.states.delete('--show-error');
+      // https://developer.mozilla.org/en-US/docs/Web/API/CustomStateSet#compability_with_dashed-ident_syntax
+
+      if (showError) {
+        try {
+          states.add(state);
+        } catch {
+          states.add(`--${state}`);
+        }
+      } else {
+        states.delete(state);
+        states.delete(`--${state}`);
       }
 
       return showError;
@@ -419,12 +426,12 @@ export function FormControlMixin<
       /** Once all the async validators have settled, resolve validationComplete */
       Promise.allSettled(asyncValidators)
         .then(() => {
-          /** Don't resolve validations if the signal is aborted */
-          if (!abortController?.signal.aborted) {
-            this.#isValidationPending = false;
-            this.#validationCompleteResolver?.();
-          }
-        });
+        /** Don't resolve validations if the signal is aborted */
+        if (!abortController?.signal.aborted) {
+          this.#isValidationPending = false;
+          this.#validationCompleteResolver?.();
+        }
+      });
 
       /**
        * If async validators are present:
@@ -484,7 +491,7 @@ export function FormControlMixin<
       }
     }
 
-     /** Reset control state when the form is reset */
+    /** Reset control state when the form is reset */
     formResetCallback() {
       this.#touched = false;
       this.#forceError = false;
