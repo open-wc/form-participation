@@ -194,7 +194,7 @@ export class CustomControl extends FormControlMixin(HTMLElement) {
     root.append(template.contents.cloneNode(true));
   }
 
-  get validationTarget(): HTMLInputElment {
+  get validationTarget(): HTMLInputElement {
     return this.shadowRoot.querySelector<HTMLInputElement>('input');
   }
 }
